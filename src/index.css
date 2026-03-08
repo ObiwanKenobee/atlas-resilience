@@ -140,9 +140,20 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Space Grotesk', sans-serif;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  .theme-dark body,
+  body {
     background-image:
       radial-gradient(ellipse at 20% 50%, hsl(158 65% 42% / 0.04) 0%, transparent 60%),
       radial-gradient(ellipse at 80% 20%, hsl(198 90% 52% / 0.04) 0%, transparent 60%);
+  }
+
+  .theme-light body {
+    background-image:
+      radial-gradient(ellipse at 20% 50%, hsl(158 55% 34% / 0.03) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, hsl(198 75% 40% / 0.03) 0%, transparent 60%);
   }
 
   h1, h2, h3, h4, h5, h6 {
