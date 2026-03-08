@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radio, RadioTower } from "lucide-react";
+import { RadioTower, FileText, GitCompare } from "lucide-react";
 import AtlasHeader from "@/components/atlas/AtlasHeader";
 import ResilienceScoreRing from "@/components/atlas/ResilienceScoreRing";
 import TippingPointMeter from "@/components/atlas/TippingPointMeter";
@@ -11,6 +11,9 @@ import BufferGauges from "@/components/atlas/BufferGauges";
 import RecoveryCurves from "@/components/atlas/RecoveryCurves";
 import NetworkFragilityGraph from "@/components/atlas/NetworkFragilityGraph";
 import HistoricalTimeline from "@/components/atlas/HistoricalTimeline";
+import PlanetaryRiskMatrix from "@/components/atlas/PlanetaryRiskMatrix";
+import CityReportExport from "@/components/atlas/CityReportExport";
+import ComparativeMode from "@/components/atlas/ComparativeMode";
 import { useLiveData } from "@/hooks/useLiveData";
 import type { CityData } from "@/components/atlas/SystemStressMap";
 import type { NetworkNode, NetworkEdge } from "@/components/atlas/NetworkFragilityGraph";
