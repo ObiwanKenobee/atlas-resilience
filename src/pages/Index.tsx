@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radio, RadioTower } from "lucide-react";
+import { RadioTower, FileText, GitCompare } from "lucide-react";
 import AtlasHeader from "@/components/atlas/AtlasHeader";
 import ResilienceScoreRing from "@/components/atlas/ResilienceScoreRing";
 import TippingPointMeter from "@/components/atlas/TippingPointMeter";
@@ -11,6 +11,9 @@ import BufferGauges from "@/components/atlas/BufferGauges";
 import RecoveryCurves from "@/components/atlas/RecoveryCurves";
 import NetworkFragilityGraph from "@/components/atlas/NetworkFragilityGraph";
 import HistoricalTimeline from "@/components/atlas/HistoricalTimeline";
+import PlanetaryRiskMatrix from "@/components/atlas/PlanetaryRiskMatrix";
+import CityReportExport from "@/components/atlas/CityReportExport";
+import ComparativeMode from "@/components/atlas/ComparativeMode";
 import { useLiveData } from "@/hooks/useLiveData";
 import type { CityData } from "@/components/atlas/SystemStressMap";
 import type { NetworkNode, NetworkEdge } from "@/components/atlas/NetworkFragilityGraph";
@@ -335,6 +338,10 @@ const Index = () => {
   const [selectedCityId, setSelectedCityId] = useState("nairobi");
   const [selectedCityLabel, setSelectedCityLabel] = useState({ name: "Nairobi", region: "East Africa" });
   const [liveMode, setLiveMode] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareCityAId, setCompareCityAId] = useState("nairobi");
+  const [compareCityBId, setCompareCityBId] = useState("jakarta");
 
   const handleCitySelect = (city: CityData) => {
     setSelectedCityId(city.id);
@@ -352,20 +359,70 @@ const Index = () => {
   const netGraph = networkData[selectedCityId];
   const histData = historicalData[selectedCityId];
 
+  // Data for the Planetary Risk Matrix
+  const riskMatrixCities = Object.entries(cityDataset).map(([id, data]) => ({
+    id,
+    name: id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1),
+    region: networkData[id] ? (
+      id === "nairobi" ? "East Africa" :
+      id === "lagos" ? "West Africa" :
+      id === "cairo" ? "North Africa" :
+      id === "mumbai" ? "South Asia" :
+      id === "saopaulo" ? "South America" : "Southeast Asia"
+    ) : "",
+    score: data.score,
+    tipping: data.tippingProbability,
+  }));
+
+  // Compare city objects
+  const buildCompareCity = (id: string) => {
+    const d = cityDataset[id];
+    const label = id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1);
+    const region =
+      id === "nairobi" ? "East Africa" :
+      id === "lagos" ? "West Africa" :
+      id === "cairo" ? "North Africa" :
+      id === "mumbai" ? "South Asia" :
+      id === "saopaulo" ? "South America" : "Southeast Asia";
+    return {
+      id,
+      name: label,
+      region,
+      score: d.score,
+      subscores: d.subscores.map((s) => ({
+        ...s,
+        fullLabel: s.label === "REDUNDANCY" ? "Redundancy" :
+          s.label === "DIVERSITY" ? "Diversity" :
+          s.label === "BUFFER CAP." ? "Buffer Capacity" :
+          s.label === "CONNECTIVITY" ? "Connectivity" : "Recovery Speed",
+      })),
+      tippingProbability: d.tippingProbability,
+      trend: d.trend,
+    };
+  };
+
+  const cityNameMap = Object.fromEntries(
+    Object.keys(cityDataset).map((id) => [
+      id,
+      id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1),
+    ])
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <AtlasHeader />
 
       <main className="flex-1 p-4 md:p-6 space-y-4 md:space-y-6 max-w-[1600px] mx-auto w-full">
 
-        {/* Live mode toggle bar */}
+        {/* Control toolbar */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-border bg-card"
+          className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-border bg-card flex-wrap gap-3"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Live feed toggle */}
             <button
               onClick={() => setLiveMode((v) => !v)}
               className={`flex items-center gap-2 text-xs font-mono px-3 py-1.5 rounded border transition-all ${
@@ -374,9 +431,7 @@ const Index = () => {
                   : "border-border text-muted-foreground hover:border-muted-foreground/50"
               }`}
             >
-              <span
-                className={`w-2 h-2 rounded-full ${liveMode ? "bg-healthy pulse-dot" : "bg-muted-foreground"}`}
-              />
+              <span className={`w-2 h-2 rounded-full ${liveMode ? "bg-healthy pulse-dot" : "bg-muted-foreground"}`} />
               <RadioTower className="w-3 h-3" />
               <span>{liveMode ? "LIVE FEED ACTIVE" : "ENABLE LIVE FEED"}</span>
             </button>
@@ -389,19 +444,54 @@ const Index = () => {
                   exit={{ opacity: 0 }}
                   className="text-[10px] font-mono text-muted-foreground"
                 >
-                  Last update: {lastUpdate.toLocaleTimeString()} — tick #{tickCount}
+                  tick #{tickCount} · {lastUpdate.toLocaleTimeString()}
                 </motion.span>
               )}
             </AnimatePresence>
           </div>
-          <p className="text-[10px] font-mono text-muted-foreground hidden md:block">
-            Live mode drifts resilience metrics in real-time to simulate a monitoring feed
-          </p>
+          <div className="flex items-center gap-2">
+            {/* Compare button */}
+            <button
+              onClick={() => setShowCompare(true)}
+              className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded border border-border text-muted-foreground hover:border-accent/50 hover:text-accent transition-all"
+            >
+              <GitCompare className="w-3 h-3" />
+              <span>COMPARE CITIES</span>
+            </button>
+            {/* Export button */}
+            <button
+              onClick={() => setShowReport(true)}
+              className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded border border-border text-muted-foreground hover:border-primary/50 hover:text-primary transition-all"
+            >
+              <FileText className="w-3 h-3" />
+              <span>EXPORT REPORT</span>
+            </button>
+          </div>
         </motion.div>
 
         {/* Hero row: Map full width */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.05 }}>
           <SystemStressMap onSelectCity={handleCitySelect} />
+        </motion.div>
+
+        {/* Planetary Risk Matrix — full width */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.12 }}>
+          <PlanetaryRiskMatrix
+            cities={riskMatrixCities}
+            selectedCityId={selectedCityId}
+            onSelectCity={(id) => {
+              const labels: Record<string, { name: string; region: string }> = {
+                nairobi: { name: "Nairobi", region: "East Africa" },
+                lagos: { name: "Lagos", region: "West Africa" },
+                cairo: { name: "Cairo", region: "North Africa" },
+                mumbai: { name: "Mumbai", region: "South Asia" },
+                saopaulo: { name: "São Paulo", region: "South America" },
+                jakarta: { name: "Jakarta", region: "Southeast Asia" },
+              };
+              setSelectedCityId(id);
+              setSelectedCityLabel(labels[id]);
+            }}
+          />
         </motion.div>
 
         {/* Primary info row */}
@@ -474,6 +564,33 @@ const Index = () => {
           ATLAS — Civilizational Resilience Monitor • Nature always chooses resilience over efficiency
         </motion.p>
       </main>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {showReport && (
+          <CityReportExport
+            cityName={selectedCityLabel.name}
+            region={selectedCityLabel.region}
+            score={displayedMetrics.score}
+            subscores={displayedMetrics.subscores}
+            tippingProbability={displayedMetrics.tippingProbability}
+            trend={cityInfo.trend}
+            shockEvents={histData.events}
+            onClose={() => setShowReport(false)}
+          />
+        )}
+        {showCompare && (
+          <ComparativeMode
+            cityA={buildCompareCity(compareCityAId)}
+            cityB={buildCompareCity(compareCityBId)}
+            onClose={() => setShowCompare(false)}
+            allCityIds={Object.keys(cityDataset)}
+            onChangeCityA={setCompareCityAId}
+            onChangeCityB={setCompareCityBId}
+            cityNames={cityNameMap}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

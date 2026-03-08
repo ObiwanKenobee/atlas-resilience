@@ -28,7 +28,7 @@ export const useLiveData = (
     setMetrics((prev) => {
       const newSubscores = prev.subscores.map((s) => ({
         ...s,
-        value: drift(s.value, 2.5),
+        value: Math.round(drift(s.value, 2.5)),
       }));
       const newScore = clamp(
         Math.round(newSubscores.reduce((acc, s) => acc + s.value, 0) / newSubscores.length)
