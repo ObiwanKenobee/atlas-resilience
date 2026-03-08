@@ -631,6 +631,25 @@ const Index = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* City Detail Drawer */}
+      <CityDetailDrawer
+        city={drawerCity}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onExport={() => { setDrawerOpen(false); setShowReport(true); }}
+        onCompare={() => {
+          if (drawerCity) {
+            setCompareCityAId(drawerCity.id);
+            setCompareCityBId(drawerCity.id === "jakarta" ? "saopaulo" : "jakarta");
+          }
+          setDrawerOpen(false);
+          setShowCompare(true);
+        }}
+        alerts={liveAlerts}
+        tippingProbability={cityInfo.tippingProbability}
+        trend={cityInfo.trend}
+      />
     </div>
   );
 };
