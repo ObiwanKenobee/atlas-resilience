@@ -501,7 +501,7 @@ const Index = () => {
 
         {/* Alerts & Notifications panel — full width */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.08 }}>
-          <AlertsPanel selectedCityId={selectedCityId} />
+          <AlertsPanel selectedCityId={selectedCityId} onAlertsChange={handleAlertsChange} />
         </motion.div>
 
         {/* Planetary Risk Matrix — full width */}
