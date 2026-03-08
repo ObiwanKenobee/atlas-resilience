@@ -348,6 +348,9 @@ const Index = () => {
   const [compareCityAId, setCompareCityAId] = useState("nairobi");
   const [compareCityBId, setCompareCityBId] = useState("jakarta");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [drawerCity, setDrawerCity] = useState<CityData | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [liveAlerts, setLiveAlerts] = useState<AlertEvent[]>([]);
 
   // Apply theme class to <html>
   useEffect(() => {
@@ -359,7 +362,13 @@ const Index = () => {
   const handleCitySelect = (city: CityData) => {
     setSelectedCityId(city.id);
     setSelectedCityLabel({ name: city.name, region: city.region });
+    setDrawerCity(city);
+    setDrawerOpen(true);
   };
+
+  const handleAlertsChange = useCallback((alerts: AlertEvent[]) => {
+    setLiveAlerts(alerts);
+  }, []);
 
   const cityInfo = cityDataset[selectedCityId];
 
