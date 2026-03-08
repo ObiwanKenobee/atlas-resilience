@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RadioTower, FileText, GitCompare } from "lucide-react";
 import AtlasHeader from "@/components/atlas/AtlasHeader";
@@ -14,6 +14,7 @@ import HistoricalTimeline from "@/components/atlas/HistoricalTimeline";
 import PlanetaryRiskMatrix from "@/components/atlas/PlanetaryRiskMatrix";
 import CityReportExport from "@/components/atlas/CityReportExport";
 import ComparativeMode from "@/components/atlas/ComparativeMode";
+import AlertsPanel from "@/components/atlas/AlertsPanel";
 import { useLiveData } from "@/hooks/useLiveData";
 import type { CityData } from "@/components/atlas/SystemStressMap";
 import type { NetworkNode, NetworkEdge } from "@/components/atlas/NetworkFragilityGraph";
