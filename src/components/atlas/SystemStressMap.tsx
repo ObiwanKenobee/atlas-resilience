@@ -1,37 +1,38 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import WorldMapBackground from "./WorldMapBackground";
 
 interface CityData {
   id: string;
   name: string;
   region: string;
-  x: number;
-  y: number;
+  x: number; // % of viewBox width  (0-100)
+  y: number; // % of viewBox height (0-100)
   score: number;
   sectors: { name: string; status: "resilient" | "moderate" | "stressed" | "fragile" }[];
 }
 
+/**
+ * Geographic → SVG percentage coordinates.
+ * ViewBox: 1000 × 500  (Mercator: lon -180→180, lat 90→-90)
+ *
+ * x% = (lon + 180) / 360 * 100
+ * y% = (90 - lat) / 180 * 100
+ *
+ * Lagos,    Nigeria  :  lon 3.4  lat 6.5   → x≈51.0  y≈46.4
+ * Nairobi,  Kenya    :  lon 36.8 lat -1.3  → x≈60.2  y≈50.7
+ * Cairo,    Egypt    :  lon 31.2 lat 30.0  → x≈58.7  y≈33.3
+ * Mumbai,   India    :  lon 72.8 lat 19.1  → x≈70.2  y≈39.4
+ * São Paulo,Brazil   :  lon-46.6 lat-23.5  → x≈37.1  y≈63.1
+ * Jakarta,  Indonesia:  lon106.8 lat -6.2  → x≈85.2  y≈53.4
+ */
 const cities: CityData[] = [
-  {
-    id: "nairobi",
-    name: "Nairobi",
-    region: "East Africa",
-    x: 55,
-    y: 52,
-    score: 58,
-    sectors: [
-      { name: "Food System", status: "moderate" },
-      { name: "Water", status: "stressed" },
-      { name: "Infrastructure", status: "fragile" },
-      { name: "Finance", status: "resilient" },
-    ],
-  },
   {
     id: "lagos",
     name: "Lagos",
     region: "West Africa",
-    x: 42,
-    y: 50,
+    x: 51.0,
+    y: 46.4,
     score: 44,
     sectors: [
       { name: "Energy Grid", status: "fragile" },
@@ -41,11 +42,25 @@ const cities: CityData[] = [
     ],
   },
   {
+    id: "nairobi",
+    name: "Nairobi",
+    region: "East Africa",
+    x: 60.2,
+    y: 50.7,
+    score: 58,
+    sectors: [
+      { name: "Food System", status: "moderate" },
+      { name: "Water", status: "stressed" },
+      { name: "Infrastructure", status: "fragile" },
+      { name: "Finance", status: "resilient" },
+    ],
+  },
+  {
     id: "cairo",
     name: "Cairo",
     region: "North Africa",
-    x: 51,
-    y: 38,
+    x: 58.7,
+    y: 33.3,
     score: 62,
     sectors: [
       { name: "Water", status: "stressed" },
@@ -58,8 +73,8 @@ const cities: CityData[] = [
     id: "mumbai",
     name: "Mumbai",
     region: "South Asia",
-    x: 67,
-    y: 46,
+    x: 70.2,
+    y: 39.4,
     score: 55,
     sectors: [
       { name: "Infrastructure", status: "stressed" },
@@ -72,8 +87,8 @@ const cities: CityData[] = [
     id: "saopaulo",
     name: "São Paulo",
     region: "South America",
-    x: 27,
-    y: 65,
+    x: 37.1,
+    y: 63.1,
     score: 67,
     sectors: [
       { name: "Water", status: "stressed" },
@@ -86,8 +101,8 @@ const cities: CityData[] = [
     id: "jakarta",
     name: "Jakarta",
     region: "Southeast Asia",
-    x: 76,
-    y: 56,
+    x: 85.2,
+    y: 53.4,
     score: 39,
     sectors: [
       { name: "Coastal Flooding", status: "fragile" },
@@ -123,7 +138,7 @@ const SystemStressMap = ({ onSelectCity }: { onSelectCity: (city: CityData) => v
 
   return (
     <div className="card-atlas p-6 space-y-4">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between flex-wrap gap-2">
         <div>
           <p className="text-xs font-mono text-muted-foreground tracking-widest uppercase">
             Planetary Resilience Map
@@ -132,7 +147,7 @@ const SystemStressMap = ({ onSelectCity }: { onSelectCity: (city: CityData) => v
             System Stress Overview
           </h3>
         </div>
-        <div className="flex items-center gap-3 text-[10px] font-mono">
+        <div className="flex items-center gap-3 text-[10px] font-mono flex-wrap">
           {(["resilient", "moderate", "stressed", "fragile"] as const).map((s) => (
             <div key={s} className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColor[s] }} />
@@ -143,42 +158,35 @@ const SystemStressMap = ({ onSelectCity }: { onSelectCity: (city: CityData) => v
       </div>
 
       {/* Map area */}
-      <div className="relative w-full aspect-[2/1] bg-muted/20 rounded-lg border border-border overflow-hidden">
-        {/* Grid lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 50">
-          {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(x => (
-            <line key={x} x1={x} y1="0" x2={x} y2="50" stroke="hsl(var(--border))" strokeWidth="0.3" />
-          ))}
-          {[10, 20, 30, 40].map(y => (
-            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="hsl(var(--border))" strokeWidth="0.3" />
-          ))}
-        </svg>
+      <div className="relative w-full aspect-[2/1] bg-background/60 rounded-lg border border-border overflow-hidden">
 
-        {/* Subtle continent outlines */}
-        <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 50">
-          <ellipse cx="50" cy="44" rx="14" ry="6" fill="hsl(var(--foreground))" />
-          <ellipse cx="50" cy="26" rx="10" ry="14" fill="hsl(var(--foreground))" />
-          <ellipse cx="70" cy="28" rx="14" ry="10" fill="hsl(var(--foreground))" />
-          <ellipse cx="25" cy="30" rx="8" ry="7" fill="hsl(var(--foreground))" />
-          <ellipse cx="30" cy="20" rx="6" ry="5" fill="hsl(var(--foreground))" />
-          <ellipse cx="85" cy="34" rx="7" ry="5" fill="hsl(var(--foreground))" />
-        </svg>
+        {/* Real SVG world map */}
+        <WorldMapBackground />
 
-        {/* Connection lines between cities */}
-        <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 100 50">
+        {/* Connection arcs between cities — drawn in the same 100×50 space */}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 100 50"
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
           {cities.map((city, i) =>
-            cities.slice(i + 1).map((other) => (
-              <line
-                key={`${city.id}-${other.id}`}
-                x1={city.x}
-                y1={city.y / 2}
-                x2={other.x}
-                y2={other.y / 2}
-                stroke="hsl(var(--accent))"
-                strokeWidth="0.15"
-                strokeDasharray="1 2"
-              />
-            ))
+            cities.slice(i + 1).map((other) => {
+              // midpoint + slight upward curve
+              const mx = (city.x + other.x) / 2;
+              const my = (city.y + other.y) / 2 - 4;
+              return (
+                <path
+                  key={`${city.id}-${other.id}`}
+                  d={`M ${city.x} ${city.y / 2} Q ${mx} ${my / 2} ${other.x} ${other.y / 2}`}
+                  fill="none"
+                  stroke="hsl(var(--accent))"
+                  strokeWidth="0.18"
+                  strokeDasharray="1 2.5"
+                  opacity="0.22"
+                />
+              );
+            })
           )}
         </svg>
 
@@ -202,11 +210,9 @@ const SystemStressMap = ({ onSelectCity }: { onSelectCity: (city: CityData) => v
             {selected === city.id && (
               <motion.div
                 className="absolute inset-0 rounded-full"
-                style={{
-                  border: `2px solid ${scoreColor(city.score)}`,
-                }}
-                animate={{ scale: [1, 2.2], opacity: [0.6, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
+                style={{ border: `2px solid ${scoreColor(city.score)}` }}
+                animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity }}
               />
             )}
             {/* Main dot */}
@@ -214,21 +220,31 @@ const SystemStressMap = ({ onSelectCity }: { onSelectCity: (city: CityData) => v
               className="w-3.5 h-3.5 rounded-full border-2 border-background"
               style={{
                 backgroundColor: scoreColor(city.score),
-                boxShadow: selected === city.id ? `0 0 10px ${scoreColor(city.score)}` : undefined,
+                boxShadow: selected === city.id
+                  ? `0 0 10px 2px ${scoreColor(city.score)}`
+                  : `0 0 4px 1px ${scoreColor(city.score)}66`,
               }}
             />
             {/* Label */}
             <div
-              className={`absolute left-full ml-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono whitespace-nowrap pointer-events-none transition-opacity ${
+              className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 text-[10px] font-mono whitespace-nowrap pointer-events-none transition-opacity ${
                 hovered === city.id || selected === city.id ? "opacity-100" : "opacity-0"
               }`}
               style={{ color: scoreColor(city.score) }}
             >
-              <div className="font-bold">{city.name}</div>
-              <div className="text-muted-foreground">{city.score}/100</div>
+              <div className="font-bold leading-tight">{city.name}</div>
+              <div className="text-muted-foreground text-[9px]">{city.score}/100</div>
             </div>
           </motion.button>
         ))}
+
+        {/* Equator label */}
+        <div
+          className="absolute left-1 text-[8px] font-mono text-muted-foreground/30 pointer-events-none"
+          style={{ top: "50%" }}
+        >
+          EQ
+        </div>
       </div>
 
       {/* City detail strip */}
