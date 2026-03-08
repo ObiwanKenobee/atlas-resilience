@@ -5,7 +5,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 @layer base {
-  :root {
+  /* ── Dark theme (default: deep space) ── */
+  :root,
+  .theme-dark {
     /* Atlas Deep Space Palette */
     --background: 220 30% 5%;
     --foreground: 210 20% 90%;
@@ -66,6 +68,67 @@
     --sidebar-accent-foreground: 210 20% 70%;
     --sidebar-border: 220 20% 14%;
     --sidebar-ring: 198 90% 52%;
+  }
+
+  /* ── Light theme (editorial) ── */
+  .theme-light {
+    --background: 210 20% 97%;
+    --foreground: 220 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 12%;
+
+    --primary: 158 55% 34%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 15% 92%;
+    --secondary-foreground: 220 25% 30%;
+
+    --muted: 210 12% 93%;
+    --muted-foreground: 215 12% 48%;
+
+    --accent: 198 75% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 68% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 18% 84%;
+    --input: 214 18% 90%;
+    --ring: 158 55% 34%;
+    --radius: 0.625rem;
+
+    /* Custom resilience tokens — slightly deeper in light */
+    --healthy: 158 55% 34%;
+    --warn: 38 88% 44%;
+    --stress: 25 80% 44%;
+    --critical: 0 68% 50%;
+    --neutral: 215 10% 50%;
+
+    /* Softer glows for light mode */
+    --glow-green: 0 0 16px hsl(158 55% 34% / 0.25);
+    --glow-amber: 0 0 16px hsl(38 88% 44% / 0.25);
+    --glow-red: 0 0 16px hsl(0 68% 50% / 0.25);
+    --glow-blue: 0 0 16px hsl(198 75% 40% / 0.2);
+
+    /* Light gradients */
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 15% 97%));
+    --gradient-hero: linear-gradient(180deg, hsl(210 20% 97%), hsl(210 15% 94%));
+    --gradient-healthy: linear-gradient(135deg, hsl(158 55% 34%), hsl(168 50% 28%));
+    --gradient-warn: linear-gradient(135deg, hsl(38 88% 44%), hsl(28 82% 38%));
+    --gradient-stress: linear-gradient(135deg, hsl(0 68% 50%), hsl(10 72% 42%));
+
+    --sidebar-background: 210 18% 94%;
+    --sidebar-foreground: 220 25% 25%;
+    --sidebar-primary: 158 55% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 15% 88%;
+    --sidebar-accent-foreground: 220 25% 30%;
+    --sidebar-border: 214 18% 82%;
+    --sidebar-ring: 198 75% 40%;
   }
 }
 
