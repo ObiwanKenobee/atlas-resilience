@@ -186,18 +186,13 @@ const Index = () => {
 
       <main className="flex-1 p-4 md:p-6 space-y-4 md:space-y-6 max-w-[1600px] mx-auto w-full">
         {/* Hero row: Map full width */}
-        <motion.div variants={itemAnim} initial="hidden" animate="show">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.05 }}>
           <SystemStressMap onSelectCity={handleCitySelect} />
         </motion.div>
 
         {/* Primary info row */}
-        <motion.div
-          variants={containerAnim}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
-          <motion.div variants={itemAnim}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.15 }}>
             <ResilienceScoreRing
               score={cityInfo.score}
               subscores={cityInfo.subscores}
@@ -206,7 +201,7 @@ const Index = () => {
             />
           </motion.div>
 
-          <motion.div variants={itemAnim}>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.25 }}>
             <TippingPointMeter
               probability={cityInfo.tippingProbability}
               trend={cityInfo.trend}
@@ -214,30 +209,25 @@ const Index = () => {
             />
           </motion.div>
 
-          <motion.div variants={itemAnim}>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.35 }}>
             <DimensionPanel dimensions={cityDimensions(selectedCityId)} />
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Secondary row: Buffers + Recovery + Shock sim */}
-        <motion.div
-          variants={containerAnim}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
-          <motion.div variants={itemAnim}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.45 }}>
             <BufferGauges buffers={bufferData} />
           </motion.div>
 
-          <motion.div variants={itemAnim}>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.55 }}>
             <RecoveryCurves systems={recoverySystemData} />
           </motion.div>
 
-          <motion.div variants={itemAnim}>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.65 }}>
             <ShockSimulator />
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Footer credit line */}
         <motion.p
