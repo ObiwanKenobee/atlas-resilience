@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, X, AlertTriangle, Zap, Droplets, TrendingDown, Wind, ShieldAlert, RefreshCw } from "lucide-react";
+import { Bell, X, AlertTriangle, Zap, Droplets, TrendingDown, Wind, ShieldAlert, RefreshCw, Volume2, VolumeX } from "lucide-react";
+import { useAlertSound } from "@/hooks/useAlertSound";
 
 export interface AlertEvent {
   id: string;
@@ -63,11 +64,13 @@ const STATUS_STYLES = {
 
 interface AlertsPanelProps {
   selectedCityId?: string;
+  /** Lifted-state setter so drawer can read top-2 city alerts */
+  onAlertsChange?: (alerts: AlertEvent[]) => void;
 }
 
 let alertCounter = 100;
 
-const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
+const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
   const [alerts, setAlerts] = useState<AlertEvent[]>(() =>
     SEED_ALERTS.map((a, i) => ({
       ...a,
@@ -77,7 +80,15 @@ const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
   const [filter, setFilter] = useState<"all" | "critical" | "high" | "medium" | "low">("all");
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [isExpanded, setIsExpanded] = useState(true);
+  const [muted, setMuted] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+
+  const { playPing } = useAlertSound(muted);
+
+  // Propagate alerts up to parent when changed
+  useEffect(() => {
+    onAlertsChange?.(alerts);
+  }, [alerts, onAlertsChange]);
 
   // Simulate incoming live alerts every ~8-14 seconds
   useEffect(() => {
@@ -88,6 +99,12 @@ const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
         id: `live-${++alertCounter}`,
         timestamp: new Date(),
       };
+
+      // Play ping for CRITICAL alerts
+      if (newAlert.severity === "critical") {
+        playPing();
+      }
+
       setAlerts((prev) => {
         const updated = [newAlert, ...prev].slice(0, 40);
         return updated.sort((a, b) => {
@@ -98,7 +115,7 @@ const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
       });
     }, 10000 + Math.random() * 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [playPing]);
 
   const filtered = alerts.filter((a) => {
     const matchSev = filter === "all" || a.severity === filter;
@@ -135,7 +152,7 @@ const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
     <div className="card-atlas rounded-lg overflow-hidden">
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 border-b border-border cursor-pointer"
+        className="flex items-center justify-between px-4 py-3 border-b border-border cursor-pointer select-none"
         onClick={() => setIsExpanded((v) => !v)}
       >
         <div className="flex items-center gap-3">
@@ -168,7 +185,19 @@ const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
             <span>LIVE</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          {/* Mute toggle */}
+          <button
+            onClick={() => setMuted((v) => !v)}
+            className={`p-1.5 rounded border transition-all ${
+              muted
+                ? "border-muted-foreground/30 text-muted-foreground/50 hover:border-muted-foreground/60 hover:text-muted-foreground"
+                : "border-warn/40 text-warn hover:border-warn/70"
+            }`}
+            title={muted ? "Unmute critical alert sound" : "Mute alert sound"}
+          >
+            {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+          </button>
           <span className="text-[10px] font-mono text-muted-foreground">{filtered.length} events</span>
           <motion.div
             animate={{ rotate: isExpanded ? 0 : -90 }}
@@ -311,9 +340,17 @@ const AlertsPanel = ({ selectedCityId }: AlertsPanelProps) => {
                 <span>{alerts.filter((a) => a.status === "monitoring").length} monitoring</span>
                 <span>{alerts.filter((a) => a.status === "resolved").length} resolved</span>
               </div>
-              <span className="text-[10px] font-mono text-muted-foreground/40">
-                AUTO-REFRESH 10s
-              </span>
+              <div className="flex items-center gap-2">
+                {muted && (
+                  <span className="text-[10px] font-mono text-muted-foreground/50 flex items-center gap-1">
+                    <VolumeX className="w-3 h-3" />
+                    SOUND OFF
+                  </span>
+                )}
+                <span className="text-[10px] font-mono text-muted-foreground/40">
+                  AUTO-REFRESH 10s
+                </span>
+              </div>
             </div>
           </motion.div>
         )}
