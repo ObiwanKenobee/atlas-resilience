@@ -343,6 +343,14 @@ const Index = () => {
   const [showCompare, setShowCompare] = useState(false);
   const [compareCityAId, setCompareCityAId] = useState("nairobi");
   const [compareCityBId, setCompareCityBId] = useState("jakarta");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  // Apply theme class to <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("theme-dark", "theme-light");
+    root.classList.add(`theme-${theme}`);
+  }, [theme]);
 
   const handleCitySelect = (city: CityData) => {
     setSelectedCityId(city.id);
