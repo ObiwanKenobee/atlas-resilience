@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RadioTower, FileText, GitCompare } from "lucide-react";
 import AtlasHeader from "@/components/atlas/AtlasHeader";
@@ -15,9 +15,11 @@ import PlanetaryRiskMatrix from "@/components/atlas/PlanetaryRiskMatrix";
 import CityReportExport from "@/components/atlas/CityReportExport";
 import ComparativeMode from "@/components/atlas/ComparativeMode";
 import AlertsPanel from "@/components/atlas/AlertsPanel";
+import CityDetailDrawer from "@/components/atlas/CityDetailDrawer";
 import { useLiveData } from "@/hooks/useLiveData";
 import type { CityData } from "@/components/atlas/SystemStressMap";
 import type { NetworkNode, NetworkEdge } from "@/components/atlas/NetworkFragilityGraph";
+import type { AlertEvent } from "@/components/atlas/AlertsPanel";
 
 
 
@@ -346,6 +348,9 @@ const Index = () => {
   const [compareCityAId, setCompareCityAId] = useState("nairobi");
   const [compareCityBId, setCompareCityBId] = useState("jakarta");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [drawerCity, setDrawerCity] = useState<CityData | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [liveAlerts, setLiveAlerts] = useState<AlertEvent[]>([]);
 
   // Apply theme class to <html>
   useEffect(() => {
@@ -357,7 +362,13 @@ const Index = () => {
   const handleCitySelect = (city: CityData) => {
     setSelectedCityId(city.id);
     setSelectedCityLabel({ name: city.name, region: city.region });
+    setDrawerCity(city);
+    setDrawerOpen(true);
   };
+
+  const handleAlertsChange = useCallback((alerts: AlertEvent[]) => {
+    setLiveAlerts(alerts);
+  }, []);
 
   const cityInfo = cityDataset[selectedCityId];
 
@@ -490,7 +501,7 @@ const Index = () => {
 
         {/* Alerts & Notifications panel — full width */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.08 }}>
-          <AlertsPanel selectedCityId={selectedCityId} />
+          <AlertsPanel selectedCityId={selectedCityId} onAlertsChange={handleAlertsChange} />
         </motion.div>
 
         {/* Planetary Risk Matrix — full width */}
@@ -620,6 +631,25 @@ const Index = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* City Detail Drawer */}
+      <CityDetailDrawer
+        city={drawerCity}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onExport={() => { setDrawerOpen(false); setShowReport(true); }}
+        onCompare={() => {
+          if (drawerCity) {
+            setCompareCityAId(drawerCity.id);
+            setCompareCityBId(drawerCity.id === "jakarta" ? "saopaulo" : "jakarta");
+          }
+          setDrawerOpen(false);
+          setShowCompare(true);
+        }}
+        alerts={liveAlerts}
+        tippingProbability={cityInfo.tippingProbability}
+        trend={cityInfo.trend}
+      />
     </div>
   );
 };
