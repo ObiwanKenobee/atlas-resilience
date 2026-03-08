@@ -338,6 +338,10 @@ const Index = () => {
   const [selectedCityId, setSelectedCityId] = useState("nairobi");
   const [selectedCityLabel, setSelectedCityLabel] = useState({ name: "Nairobi", region: "East Africa" });
   const [liveMode, setLiveMode] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareCityAId, setCompareCityAId] = useState("nairobi");
+  const [compareCityBId, setCompareCityBId] = useState("jakarta");
 
   const handleCitySelect = (city: CityData) => {
     setSelectedCityId(city.id);
@@ -354,6 +358,55 @@ const Index = () => {
   const displayedMetrics = liveMode ? liveMetrics : cityInfo;
   const netGraph = networkData[selectedCityId];
   const histData = historicalData[selectedCityId];
+
+  // Data for the Planetary Risk Matrix
+  const riskMatrixCities = Object.entries(cityDataset).map(([id, data]) => ({
+    id,
+    name: id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1),
+    region: networkData[id] ? (
+      id === "nairobi" ? "East Africa" :
+      id === "lagos" ? "West Africa" :
+      id === "cairo" ? "North Africa" :
+      id === "mumbai" ? "South Asia" :
+      id === "saopaulo" ? "South America" : "Southeast Asia"
+    ) : "",
+    score: data.score,
+    tipping: data.tippingProbability,
+  }));
+
+  // Compare city objects
+  const buildCompareCity = (id: string) => {
+    const d = cityDataset[id];
+    const label = id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1);
+    const region =
+      id === "nairobi" ? "East Africa" :
+      id === "lagos" ? "West Africa" :
+      id === "cairo" ? "North Africa" :
+      id === "mumbai" ? "South Asia" :
+      id === "saopaulo" ? "South America" : "Southeast Asia";
+    return {
+      id,
+      name: label,
+      region,
+      score: d.score,
+      subscores: d.subscores.map((s) => ({
+        ...s,
+        fullLabel: s.label === "REDUNDANCY" ? "Redundancy" :
+          s.label === "DIVERSITY" ? "Diversity" :
+          s.label === "BUFFER CAP." ? "Buffer Capacity" :
+          s.label === "CONNECTIVITY" ? "Connectivity" : "Recovery Speed",
+      })),
+      tippingProbability: d.tippingProbability,
+      trend: d.trend,
+    };
+  };
+
+  const cityNameMap = Object.fromEntries(
+    Object.keys(cityDataset).map((id) => [
+      id,
+      id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1),
+    ])
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
