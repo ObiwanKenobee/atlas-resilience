@@ -160,14 +160,7 @@ const recoverySystemData = [
   },
 ];
 
-const containerAnim = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
-};
-const itemAnim = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
-};
+
 
 const Index = () => {
   const [selectedCityId, setSelectedCityId] = useState("nairobi");
