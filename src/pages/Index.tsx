@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RadioTower, FileText, GitCompare } from "lucide-react";
 import AtlasHeader from "@/components/atlas/AtlasHeader";
@@ -14,9 +14,12 @@ import HistoricalTimeline from "@/components/atlas/HistoricalTimeline";
 import PlanetaryRiskMatrix from "@/components/atlas/PlanetaryRiskMatrix";
 import CityReportExport from "@/components/atlas/CityReportExport";
 import ComparativeMode from "@/components/atlas/ComparativeMode";
+import AlertsPanel from "@/components/atlas/AlertsPanel";
 import { useLiveData } from "@/hooks/useLiveData";
 import type { CityData } from "@/components/atlas/SystemStressMap";
 import type { NetworkNode, NetworkEdge } from "@/components/atlas/NetworkFragilityGraph";
+
+
 
 // ─── City core dataset ────────────────────────────────────────────────────────
 const cityDataset: Record<
@@ -342,6 +345,14 @@ const Index = () => {
   const [showCompare, setShowCompare] = useState(false);
   const [compareCityAId, setCompareCityAId] = useState("nairobi");
   const [compareCityBId, setCompareCityBId] = useState("jakarta");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  // Apply theme class to <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("theme-dark", "theme-light");
+    root.classList.add(`theme-${theme}`);
+  }, [theme]);
 
   const handleCitySelect = (city: CityData) => {
     setSelectedCityId(city.id);
@@ -410,16 +421,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <AtlasHeader />
+      <AtlasHeader theme={theme} onThemeToggle={() => setTheme((t) => t === "dark" ? "light" : "dark")} />
 
-      <main className="flex-1 p-4 md:p-6 space-y-4 md:space-y-6 max-w-[1600px] mx-auto w-full">
+      <main className="flex-1 p-3 md:p-6 space-y-3 md:space-y-5 max-w-[1600px] mx-auto w-full">
 
         {/* Control toolbar */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-border bg-card flex-wrap gap-3"
+          className="flex items-center justify-between px-3 md:px-4 py-2.5 rounded-lg border border-border bg-card flex-wrap gap-2"
         >
           <div className="flex items-center gap-2 flex-wrap">
             {/* Live feed toggle */}
@@ -433,7 +444,8 @@ const Index = () => {
             >
               <span className={`w-2 h-2 rounded-full ${liveMode ? "bg-healthy pulse-dot" : "bg-muted-foreground"}`} />
               <RadioTower className="w-3 h-3" />
-              <span>{liveMode ? "LIVE FEED ACTIVE" : "ENABLE LIVE FEED"}</span>
+              <span className="hidden sm:inline">{liveMode ? "LIVE FEED ACTIVE" : "ENABLE LIVE FEED"}</span>
+              <span className="sm:hidden">{liveMode ? "LIVE" : "OFFLINE"}</span>
             </button>
             <AnimatePresence>
               {liveMode && lastUpdate && (
@@ -442,29 +454,31 @@ const Index = () => {
                   initial={{ opacity: 0, x: -6 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
-                  className="text-[10px] font-mono text-muted-foreground"
+                  className="text-[10px] font-mono text-muted-foreground hidden sm:inline"
                 >
                   tick #{tickCount} · {lastUpdate.toLocaleTimeString()}
                 </motion.span>
               )}
             </AnimatePresence>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
             {/* Compare button */}
             <button
               onClick={() => setShowCompare(true)}
-              className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded border border-border text-muted-foreground hover:border-accent/50 hover:text-accent transition-all"
+              className="flex items-center gap-1.5 text-xs font-mono px-2.5 md:px-3 py-1.5 rounded border border-border text-muted-foreground hover:border-accent/50 hover:text-accent transition-all"
             >
               <GitCompare className="w-3 h-3" />
-              <span>COMPARE CITIES</span>
+              <span className="hidden sm:inline">COMPARE CITIES</span>
+              <span className="sm:hidden">COMPARE</span>
             </button>
             {/* Export button */}
             <button
               onClick={() => setShowReport(true)}
-              className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded border border-border text-muted-foreground hover:border-primary/50 hover:text-primary transition-all"
+              className="flex items-center gap-1.5 text-xs font-mono px-2.5 md:px-3 py-1.5 rounded border border-border text-muted-foreground hover:border-primary/50 hover:text-primary transition-all"
             >
               <FileText className="w-3 h-3" />
-              <span>EXPORT REPORT</span>
+              <span className="hidden sm:inline">EXPORT REPORT</span>
+              <span className="sm:hidden">EXPORT</span>
             </button>
           </div>
         </motion.div>
@@ -472,6 +486,11 @@ const Index = () => {
         {/* Hero row: Map full width */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.05 }}>
           <SystemStressMap onSelectCity={handleCitySelect} />
+        </motion.div>
+
+        {/* Alerts & Notifications panel — full width */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.08 }}>
+          <AlertsPanel selectedCityId={selectedCityId} />
         </motion.div>
 
         {/* Planetary Risk Matrix — full width */}
@@ -495,7 +514,7 @@ const Index = () => {
         </motion.div>
 
         {/* Primary info row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.15 }}>
             <ResilienceScoreRing
               key={`${selectedCityId}-${liveMode ? tickCount : 0}`}
@@ -514,13 +533,18 @@ const Index = () => {
             />
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.35 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.35 }}
+            className="sm:col-span-2 lg:col-span-1"
+          >
             <DimensionPanel dimensions={cityDimensions(selectedCityId)} />
           </motion.div>
         </div>
 
         {/* Network + Historical row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.4 }}>
             <NetworkFragilityGraph
               key={selectedCityId}
@@ -540,7 +564,7 @@ const Index = () => {
         </div>
 
         {/* Secondary row: Buffers + Recovery + Shock sim */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.45 }}>
             <BufferGauges buffers={bufferData} />
           </motion.div>
@@ -549,7 +573,12 @@ const Index = () => {
             <RecoveryCurves systems={recoverySystemData} />
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.65 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.65 }}
+            className="sm:col-span-2 lg:col-span-1"
+          >
             <ShockSimulator />
           </motion.div>
         </div>
