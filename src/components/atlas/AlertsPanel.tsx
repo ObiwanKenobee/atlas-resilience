@@ -20,33 +20,48 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
   Energy: <Zap className="w-3 h-3" />,
   Finance: <TrendingDown className="w-3 h-3" />,
   Food: <Wind className="w-3 h-3" />,
+  "Food System": <Wind className="w-3 h-3" />,
   Infrastructure: <ShieldAlert className="w-3 h-3" />,
   Ecosystem: <Wind className="w-3 h-3" />,
   Health: <AlertTriangle className="w-3 h-3" />,
+  "Flood Risk": <Droplets className="w-3 h-3" />,
+  "Typhoon Risk": <Wind className="w-3 h-3" />,
 };
 
 const SEED_ALERTS: Omit<AlertEvent, "timestamp">[] = [
-  { id: "a1", cityId: "jakarta", city: "Jakarta", severity: "critical", sector: "Infrastructure", message: "Flood defence systems at 8% operational capacity — cascade imminent", status: "active" },
-  { id: "a2", cityId: "jakarta", city: "Jakarta", severity: "critical", sector: "Water", message: "Groundwater subsidence rate +2.1 cm/yr — critical threshold breached", status: "active" },
-  { id: "a3", cityId: "lagos", city: "Lagos", severity: "critical", sector: "Energy", message: "Grid voltage instability detected — rolling blackout risk 78%", status: "active" },
-  { id: "a4", cityId: "lagos", city: "Lagos", severity: "high", sector: "Water", message: "Water treatment capacity down to 41% — contamination risk rising", status: "monitoring" },
-  { id: "a5", cityId: "mumbai", city: "Mumbai", severity: "high", sector: "Water", message: "Reservoir levels at 22% — emergency rationing protocol activated", status: "active" },
-  { id: "a6", cityId: "nairobi", city: "Nairobi", severity: "high", sector: "Food", message: "Crop yield projections revised -31% — food price shock likely Q2", status: "monitoring" },
-  { id: "a7", cityId: "mumbai", city: "Mumbai", severity: "high", sector: "Infrastructure", message: "Coastal erosion accelerating — 3 drainage nodes compromised", status: "monitoring" },
-  { id: "a8", cityId: "cairo", city: "Cairo", severity: "medium", sector: "Food", message: "Wheat import cost +22% — buffer stockpile drawdown in progress", status: "monitoring" },
-  { id: "a9", cityId: "nairobi", city: "Nairobi", severity: "medium", sector: "Finance", message: "M-Pesa transaction failures +4.2% — redundancy pathways degrading", status: "monitoring" },
-  { id: "a10", cityId: "saopaulo", city: "São Paulo", severity: "medium", sector: "Ecosystem", message: "Amazon fire corridor within 80km — air quality index critical", status: "active" },
-  { id: "a11", cityId: "cairo", city: "Cairo", severity: "low", sector: "Energy", message: "Solar capacity additions online — grid diversity improving", status: "resolved" },
-  { id: "a12", cityId: "saopaulo", city: "São Paulo", severity: "low", sector: "Finance", message: "B3 volatility index elevated — macro stress signal weak", status: "resolved" },
+  { id: "a1",  cityId: "jakarta",  city: "Jakarta",   severity: "critical", sector: "Infrastructure", message: "Flood defence systems at 8% operational capacity — cascade imminent", status: "active" },
+  { id: "a2",  cityId: "jakarta",  city: "Jakarta",   severity: "critical", sector: "Water",          message: "Groundwater subsidence rate +2.1 cm/yr — critical threshold breached", status: "active" },
+  { id: "a3",  cityId: "lagos",    city: "Lagos",     severity: "critical", sector: "Energy",         message: "Grid voltage instability detected — rolling blackout risk 78%", status: "active" },
+  { id: "a4",  cityId: "dhaka",    city: "Dhaka",     severity: "critical", sector: "Flood Risk",     message: "Monsoon surge 1.8m above normal — 14 districts inundated", status: "active" },
+  { id: "a5",  cityId: "kinshasa", city: "Kinshasa",  severity: "critical", sector: "Health",         message: "Cholera outbreak — 3 health zones overwhelmed, hospital capacity 4%", status: "active" },
+  { id: "a6",  cityId: "lagos",    city: "Lagos",     severity: "high",     sector: "Water",          message: "Water treatment capacity down to 41% — contamination risk rising", status: "monitoring" },
+  { id: "a7",  cityId: "mumbai",   city: "Mumbai",    severity: "high",     sector: "Water",          message: "Reservoir levels at 22% — emergency rationing protocol activated", status: "active" },
+  { id: "a8",  cityId: "nairobi",  city: "Nairobi",   severity: "high",     sector: "Food",           message: "Crop yield projections revised -31% — food price shock likely Q2", status: "monitoring" },
+  { id: "a9",  cityId: "karachi",  city: "Karachi",   severity: "high",     sector: "Water",          message: "Indus delta saltwater intrusion — 6 aquifers compromised", status: "active" },
+  { id: "a10", cityId: "manila",   city: "Manila",    severity: "high",     sector: "Infrastructure", message: "Typhoon track intersects metro — evacuation of 1.2M residents underway", status: "active" },
+  { id: "a11", cityId: "mumbai",   city: "Mumbai",    severity: "high",     sector: "Infrastructure", message: "Coastal erosion accelerating — 3 drainage nodes compromised", status: "monitoring" },
+  { id: "a12", cityId: "cairo",    city: "Cairo",     severity: "medium",   sector: "Food",           message: "Wheat import cost +22% — buffer stockpile drawdown in progress", status: "monitoring" },
+  { id: "a13", cityId: "nairobi",  city: "Nairobi",   severity: "medium",   sector: "Finance",        message: "M-Pesa transaction failures +4.2% — redundancy pathways degrading", status: "monitoring" },
+  { id: "a14", cityId: "saopaulo", city: "São Paulo", severity: "medium",   sector: "Ecosystem",      message: "Amazon fire corridor within 80km — air quality index critical", status: "active" },
+  { id: "a15", cityId: "bogota",   city: "Bogotá",    severity: "medium",   sector: "Water",          message: "Páramo aquifer recharge rate -18% — dry season buffer shrinking", status: "monitoring" },
+  { id: "a16", cityId: "accra",    city: "Accra",     severity: "medium",   sector: "Energy",         message: "Akosombo dam output -35% — load-shedding schedule extended to 14h/day", status: "active" },
+  { id: "a17", cityId: "cairo",    city: "Cairo",     severity: "low",      sector: "Energy",         message: "Solar capacity additions online — grid diversity improving", status: "resolved" },
+  { id: "a18", cityId: "saopaulo", city: "São Paulo", severity: "low",      sector: "Finance",        message: "B3 volatility index elevated — macro stress signal weak", status: "resolved" },
 ];
 
 const NEW_ALERT_TEMPLATES: Omit<AlertEvent, "id" | "timestamp">[] = [
-  { cityId: "jakarta", city: "Jakarta", severity: "critical", sector: "Water", message: "Saltwater intrusion detected in 6 freshwater wells", status: "active" },
-  { cityId: "lagos", city: "Lagos", severity: "high", sector: "Food", message: "Market supply disruption — 3 arterial roads flooded", status: "active" },
-  { cityId: "mumbai", city: "Mumbai", severity: "high", sector: "Finance", message: "Micro-credit default rate spike +8.3% — financial stress emerging", status: "monitoring" },
-  { cityId: "nairobi", city: "Nairobi", severity: "medium", sector: "Health", message: "Healthcare worker shortage at 34% in periurban zones", status: "monitoring" },
-  { cityId: "cairo", city: "Cairo", severity: "medium", sector: "Water", message: "Nile flow rate 12% below seasonal average", status: "monitoring" },
-  { cityId: "saopaulo", city: "São Paulo", severity: "low", sector: "Energy", message: "Hydroelectric output recovering — drought buffer restoring", status: "resolved" },
+  { cityId: "jakarta",  city: "Jakarta",   severity: "critical", sector: "Water",          message: "Saltwater intrusion detected in 6 freshwater wells", status: "active" },
+  { cityId: "dhaka",    city: "Dhaka",     severity: "critical", sector: "Infrastructure", message: "Cyclone landfall imminent — coastal embankments breached", status: "active" },
+  { cityId: "kinshasa", city: "Kinshasa",  severity: "high",     sector: "Food System",    message: "Market supply collapse — conflict disrupts 4 supply routes", status: "active" },
+  { cityId: "lagos",    city: "Lagos",     severity: "high",     sector: "Food",           message: "Market supply disruption — 3 arterial roads flooded", status: "active" },
+  { cityId: "mumbai",   city: "Mumbai",    severity: "high",     sector: "Finance",        message: "Micro-credit default rate spike +8.3% — financial stress emerging", status: "monitoring" },
+  { cityId: "karachi",  city: "Karachi",   severity: "high",     sector: "Energy",         message: "Power grid failure — 8 distribution substations offline", status: "active" },
+  { cityId: "manila",   city: "Manila",    severity: "high",     sector: "Water",          message: "Flood gate failure — Marikina river overtopping levees", status: "active" },
+  { cityId: "nairobi",  city: "Nairobi",   severity: "medium",   sector: "Health",         message: "Healthcare worker shortage at 34% in periurban zones", status: "monitoring" },
+  { cityId: "cairo",    city: "Cairo",     severity: "medium",   sector: "Water",          message: "Nile flow rate 12% below seasonal average", status: "monitoring" },
+  { cityId: "bogota",   city: "Bogotá",    severity: "medium",   sector: "Infrastructure", message: "Landslide blocks Bogotá-Villavicencio highway — supply chain disrupted", status: "monitoring" },
+  { cityId: "accra",    city: "Accra",     severity: "medium",   sector: "Water",          message: "Weija reservoir at 34% — rationing extended to northern suburbs", status: "monitoring" },
+  { cityId: "saopaulo", city: "São Paulo", severity: "low",      sector: "Energy",         message: "Hydroelectric output recovering — drought buffer restoring", status: "resolved" },
 ];
 
 const SEV_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -69,9 +84,10 @@ interface AlertsPanelProps {
   onAlertsChange?: (alerts: AlertEvent[]) => void;
 }
 
-let alertCounter = 100;
-
+// Use a ref-based counter scoped to the component mount to avoid duplicate keys
+// across React StrictMode double-invocations.
 const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
+  const alertCounterRef = useRef(Date.now());
   const [alerts, setAlerts] = useState<AlertEvent[]>(() =>
     SEED_ALERTS.map((a, i) => ({
       ...a,
@@ -101,7 +117,7 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
       const template = NEW_ALERT_TEMPLATES[Math.floor(Math.random() * NEW_ALERT_TEMPLATES.length)];
       const newAlert: AlertEvent = {
         ...template,
-        id: `live-${++alertCounter}`,
+        id: `live-${++alertCounterRef.current}`,
         timestamp: new Date(),
       };
 
@@ -144,13 +160,19 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
   };
 
   const cities = [
-    { id: "all", name: "All Cities" },
-    { id: "nairobi", name: "Nairobi" },
-    { id: "lagos", name: "Lagos" },
-    { id: "cairo", name: "Cairo" },
-    { id: "mumbai", name: "Mumbai" },
+    { id: "all",      name: "All Cities" },
+    { id: "nairobi",  name: "Nairobi" },
+    { id: "lagos",    name: "Lagos" },
+    { id: "cairo",    name: "Cairo" },
+    { id: "mumbai",   name: "Mumbai" },
     { id: "saopaulo", name: "São Paulo" },
-    { id: "jakarta", name: "Jakarta" },
+    { id: "jakarta",  name: "Jakarta" },
+    { id: "dhaka",    name: "Dhaka" },
+    { id: "karachi",  name: "Karachi" },
+    { id: "kinshasa", name: "Kinshasa" },
+    { id: "bogota",   name: "Bogotá" },
+    { id: "manila",   name: "Manila" },
+    { id: "accra",    name: "Accra" },
   ];
 
   return (
