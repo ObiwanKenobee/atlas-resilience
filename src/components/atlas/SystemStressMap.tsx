@@ -17,21 +17,12 @@ export interface CityData {
 }
 
 /**
- * Geographic → SVG percentage coordinates (Mercator).
- * ViewBox: 1000 × 500  (lon -180→180, lat 90→-90)
- *
- * x% = (lon + 180) / 360 * 100
- * y% = (90 - lat) / 180 * 100
- *
- * City coordinates verified:
- *  Lagos,     lon=3.4,   lat=6.5   → x=51.0, y=46.4
- *  Nairobi,   lon=36.8,  lat=-1.3  → x=60.2, y=50.7
- *  Cairo,     lon=31.2,  lat=30.0  → x=58.7, y=33.3
- *  Mumbai,    lon=72.8,  lat=19.1  → x=70.2, y=39.4
- *  São Paulo, lon=-46.6, lat=-23.5 → x=37.1, y=63.1
- *  Jakarta,   lon=106.8, lat=-6.2  → x=85.2, y=53.4
+ * Mercator formula:
+ *   x% = (lon + 180) / 360 * 100
+ *   y% = (90 - lat) / 180 * 100
  */
 const cities: CityData[] = [
+  // ── Original 6 ──────────────────────────────────────────────────────
   {
     id: "lagos",
     name: "Lagos",
@@ -114,6 +105,98 @@ const cities: CityData[] = [
       { name: "Water", status: "fragile" },
       { name: "Energy", status: "moderate" },
       { name: "Infrastructure", status: "stressed" },
+    ],
+  },
+  // ── New 6 ─────────────────────────────────────────────────────────
+  {
+    // lon=90.4, lat=23.7 → x=(90.4+180)/360*100=75.1, y=(90-23.7)/180*100=36.8
+    id: "dhaka",
+    name: "Dhaka",
+    region: "South Asia",
+    lon: 90.4, lat: 23.7,
+    x: 75.1, y: 36.8,
+    score: 34,
+    sectors: [
+      { name: "Flood Risk", status: "fragile" },
+      { name: "Water", status: "fragile" },
+      { name: "Health", status: "stressed" },
+      { name: "Infrastructure", status: "stressed" },
+    ],
+  },
+  {
+    // lon=67.0, lat=24.9 → x=(67+180)/360*100=68.6, y=(90-24.9)/180*100=36.2
+    id: "karachi",
+    name: "Karachi",
+    region: "South Asia",
+    lon: 67.0, lat: 24.9,
+    x: 68.6, y: 36.2,
+    score: 41,
+    sectors: [
+      { name: "Water", status: "fragile" },
+      { name: "Energy", status: "stressed" },
+      { name: "Finance", status: "moderate" },
+      { name: "Infrastructure", status: "stressed" },
+    ],
+  },
+  {
+    // lon=15.3, lat=-4.3 → x=(15.3+180)/360*100=54.3, y=(90-(-4.3))/180*100=52.4
+    id: "kinshasa",
+    name: "Kinshasa",
+    region: "Central Africa",
+    lon: 15.3, lat: -4.3,
+    x: 54.3, y: 52.4,
+    score: 31,
+    sectors: [
+      { name: "Energy", status: "fragile" },
+      { name: "Health", status: "fragile" },
+      { name: "Water", status: "stressed" },
+      { name: "Food System", status: "stressed" },
+    ],
+  },
+  {
+    // lon=-74.1, lat=4.7 → x=(-74.1+180)/360*100=29.4, y=(90-4.7)/180*100=47.4
+    id: "bogota",
+    name: "Bogotá",
+    region: "South America",
+    lon: -74.1, lat: 4.7,
+    x: 29.4, y: 47.4,
+    score: 53,
+    sectors: [
+      { name: "Ecosystem", status: "moderate" },
+      { name: "Water", status: "moderate" },
+      { name: "Infrastructure", status: "stressed" },
+      { name: "Finance", status: "resilient" },
+    ],
+  },
+  {
+    // lon=121.0, lat=14.6 → x=(121+180)/360*100=83.6, y=(90-14.6)/180*100=41.9
+    id: "manila",
+    name: "Manila",
+    region: "Southeast Asia",
+    lon: 121.0, lat: 14.6,
+    x: 83.6, y: 41.9,
+    score: 46,
+    sectors: [
+      { name: "Typhoon Risk", status: "fragile" },
+      { name: "Infrastructure", status: "stressed" },
+      { name: "Water", status: "stressed" },
+      { name: "Energy", status: "moderate" },
+    ],
+  },
+  {
+    // lon=3.9, lat=5.6 → x=(3.9+180)/360*100=51.1, y=(90-5.6)/180*100=46.9
+    // Accra — distinct from Lagos, sits on coast of Ghana
+    id: "accra",
+    name: "Accra",
+    region: "West Africa",
+    lon: 3.9, lat: 5.6,
+    x: 51.1, y: 46.9,
+    score: 49,
+    sectors: [
+      { name: "Energy", status: "stressed" },
+      { name: "Water", status: "moderate" },
+      { name: "Finance", status: "moderate" },
+      { name: "Health", status: "stressed" },
     ],
   },
 ];
