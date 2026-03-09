@@ -74,7 +74,8 @@ function classifyTitle(title: string): {
 
 // ─── ReliefWeb API (public, no key required) ─────────────────────────────────
 async function fetchReliefWeb(): Promise<GeoRiskEvent[]> {
-  const CITIES = ["lagos", "nairobi", "cairo", "mumbai", "jakarta", "brazil"];
+  const CITIES = ["lagos", "nairobi", "cairo", "mumbai", "jakarta", "brazil",
+                  "dhaka", "karachi", "kinshasa", "bogota", "manila", "accra", "ghana"];
   const query = CITIES.map((c) => `"${c}"`).join(" OR ");
 
   const res = await fetch(
