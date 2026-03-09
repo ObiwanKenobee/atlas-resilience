@@ -25,7 +25,7 @@ const CITY_KEYWORDS: { cityId: string; city: string; keywords: string[] }[] = [
   { cityId: "kinshasa", city: "Kinshasa",  keywords: ["kinshasa", "congo", "drc", "central africa"] },
   { cityId: "bogota",   city: "Bogotá",    keywords: ["bogotá", "bogota", "colombia", "andes"] },
   { cityId: "manila",   city: "Manila",    keywords: ["manila", "philippines", "luzon", "typhoon"] },
-  { cityId: "accra",    city: "Accra",     keywords: ["accra", "ghana", "volta"] },
+  { cityId: "accra",    city: "Accra",     keywords: ["accra", "ghana", "volta", "kumasi"] },
 ];
 
 const SECTOR_KEYWORDS: { sector: string; keywords: string[] }[] = [

@@ -184,13 +184,14 @@ const cities: CityData[] = [
     ],
   },
   {
-    // lon=3.9, lat=5.6 → x=(3.9+180)/360*100=51.1, y=(90-5.6)/180*100=46.9
-    // Accra — distinct from Lagos, sits on coast of Ghana
+    // Accra, Ghana — lon=-0.2, lat=5.6
+    // x=(-0.2+180)/360*100=49.9, y=(90-5.6)/180*100=46.9
+    // Note: slightly west of prime meridian, clearly distinct from Lagos (lon=3.4 → x=51.0)
     id: "accra",
     name: "Accra",
     region: "West Africa",
-    lon: 3.9, lat: 5.6,
-    x: 51.1, y: 46.9,
+    lon: -0.2, lat: 5.6,
+    x: 49.9, y: 46.9,
     score: 49,
     sectors: [
       { name: "Energy", status: "stressed" },
