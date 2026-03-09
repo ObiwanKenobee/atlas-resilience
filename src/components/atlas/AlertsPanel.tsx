@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, X, AlertTriangle, Zap, Droplets, TrendingDown, Wind, ShieldAlert, RefreshCw, Volume2, VolumeX } from "lucide-react";
+import { Bell, X, AlertTriangle, Zap, Droplets, TrendingDown, Wind, ShieldAlert, RefreshCw, Volume2, VolumeX, Rss, ExternalLink } from "lucide-react";
 import { useAlertSound } from "@/hooks/useAlertSound";
+import { useGeoPoliticalFeed } from "@/hooks/useGeoPoliticalFeed";
 
 export interface AlertEvent {
   id: string;
