@@ -102,7 +102,7 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
       const template = NEW_ALERT_TEMPLATES[Math.floor(Math.random() * NEW_ALERT_TEMPLATES.length)];
       const newAlert: AlertEvent = {
         ...template,
-        id: `live-${++alertCounter}`,
+        id: `live-${++alertCounterRef.current}`,
         timestamp: new Date(),
       };
 
