@@ -69,9 +69,10 @@ interface AlertsPanelProps {
   onAlertsChange?: (alerts: AlertEvent[]) => void;
 }
 
-let alertCounter = 100;
-
+// Use a ref-based counter scoped to the component mount to avoid duplicate keys
+// across React StrictMode double-invocations.
 const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
+  const alertCounterRef = useRef(Date.now());
   const [alerts, setAlerts] = useState<AlertEvent[]>(() =>
     SEED_ALERTS.map((a, i) => ({
       ...a,
