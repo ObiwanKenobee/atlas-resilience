@@ -255,8 +255,8 @@ const PlanetaryRiskMatrix = ({ cities, selectedCityId, onSelectCity }: Planetary
         </div>
       </div>
 
-      {/* City summary strip */}
-      <div className="px-5 pb-5 grid grid-cols-3 md:grid-cols-6 gap-2">
+      {/* City summary strip — scrollable to handle 12 cities */}
+      <div className="px-5 pb-5 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-12 gap-2">
         {cities.map((c) => {
           const q = getQuadrant(c.tipping, c.score);
           const isSel = c.id === selectedCityId;
