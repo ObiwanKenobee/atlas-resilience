@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, X, AlertTriangle, Zap, Droplets, TrendingDown, Wind, ShieldAlert, RefreshCw, Volume2, VolumeX } from "lucide-react";
+import { Bell, X, AlertTriangle, Zap, Droplets, TrendingDown, Wind, ShieldAlert, RefreshCw, Volume2, VolumeX, Rss, ExternalLink } from "lucide-react";
 import { useAlertSound } from "@/hooks/useAlertSound";
+import { useGeoPoliticalFeed } from "@/hooks/useGeoPoliticalFeed";
 
 export interface AlertEvent {
   id: string;
@@ -81,9 +82,13 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [isExpanded, setIsExpanded] = useState(true);
   const [muted, setMuted] = useState(false);
+  const [showLiveFeed, setShowLiveFeed] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   const { playPing } = useAlertSound(muted);
+
+  // ─── Geopolitical live feed ────────────────────────────────────────────────
+  const { events: geoEvents, loading: geoLoading, error: geoError, lastFetch: geoLastFetch, refresh: geoRefresh } = useGeoPoliticalFeed(showLiveFeed);
 
   // Propagate alerts up to parent when changed
   useEffect(() => {
@@ -186,6 +191,19 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
           </div>
         </div>
         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          {/* Geo Feed toggle */}
+          <button
+            onClick={() => setShowLiveFeed((v) => !v)}
+            className={`flex items-center gap-1 p-1.5 rounded border transition-all text-[10px] font-mono ${
+              showLiveFeed
+                ? "border-accent/50 bg-accent/10 text-accent"
+                : "border-border text-muted-foreground hover:border-muted-foreground/50"
+            }`}
+            title={showLiveFeed ? "Hide live geo feed" : "Show live geopolitical feed"}
+          >
+            <Rss className="w-3 h-3" />
+            <span className="hidden sm:inline">GEO FEED</span>
+          </button>
           {/* Mute toggle */}
           <button
             onClick={() => setMuted((v) => !v)}
@@ -352,6 +370,94 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
                 </span>
               </div>
             </div>
+
+            {/* ── Live Geopolitical Feed ──────────────────────────────────────── */}
+            <AnimatePresence>
+              {showLiveFeed && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="border-t border-border"
+                >
+                  <div className="flex items-center justify-between px-4 py-2 bg-accent/5">
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-accent">
+                      <Rss className="w-3 h-3" />
+                      <span className="font-bold tracking-widest">RELIEFWEB LIVE FEED</span>
+                      {geoLoading && <span className="text-muted-foreground animate-pulse">fetching…</span>}
+                      {geoLastFetch && !geoLoading && (
+                        <span className="text-muted-foreground/50">
+                          updated {Math.round((Date.now() - geoLastFetch.getTime()) / 1000 / 60)}m ago
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={geoRefresh}
+                      className="p-1 rounded border border-border text-muted-foreground hover:text-foreground transition-all"
+                      title="Refresh feed"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${geoLoading ? "animate-spin" : ""}`} />
+                    </button>
+                  </div>
+
+                  {geoError && (
+                    <div className="px-4 py-3 text-[11px] font-mono text-muted-foreground">
+                      {geoError} — showing cached alerts above
+                    </div>
+                  )}
+
+                  <div className="max-h-52 overflow-y-auto divide-y divide-border/50">
+                    {geoEvents.length === 0 && !geoLoading && !geoError && (
+                      <div className="py-6 text-center text-[11px] font-mono text-muted-foreground">
+                        No events loaded
+                      </div>
+                    )}
+                    {geoEvents.map((event) => {
+                      const sev = SEV_STYLES[event.severity];
+                      return (
+                        <div
+                          key={event.id}
+                          className="flex items-start gap-3 px-4 py-2.5 hover:bg-muted/15 transition-colors"
+                        >
+                          <span className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${sev.dot}`} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${sev.bg} ${sev.border} ${sev.text}`}>
+                                {sev.label}
+                              </span>
+                              <span className="text-[10px] font-mono text-muted-foreground font-bold">{event.city}</span>
+                              <span className="text-[10px] font-mono text-muted-foreground/70">{event.sector}</span>
+                              <span className="ml-auto text-[10px] font-mono text-muted-foreground/40">
+                                {event.source}
+                              </span>
+                            </div>
+                            <p className="text-xs text-foreground/80 mt-0.5 leading-tight line-clamp-2">{event.title}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[10px] font-mono text-muted-foreground/50">
+                                {event.publishedAt.toLocaleDateString()}
+                              </span>
+                              {event.url && (
+                                <a
+                                  href={event.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-0.5 text-[10px] font-mono text-accent/70 hover:text-accent transition-colors"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                  source
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
