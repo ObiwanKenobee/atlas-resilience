@@ -20,9 +20,12 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
   Energy: <Zap className="w-3 h-3" />,
   Finance: <TrendingDown className="w-3 h-3" />,
   Food: <Wind className="w-3 h-3" />,
+  "Food System": <Wind className="w-3 h-3" />,
   Infrastructure: <ShieldAlert className="w-3 h-3" />,
   Ecosystem: <Wind className="w-3 h-3" />,
   Health: <AlertTriangle className="w-3 h-3" />,
+  "Flood Risk": <Droplets className="w-3 h-3" />,
+  "Typhoon Risk": <Wind className="w-3 h-3" />,
 };
 
 const SEED_ALERTS: Omit<AlertEvent, "timestamp">[] = [
