@@ -82,9 +82,13 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [isExpanded, setIsExpanded] = useState(true);
   const [muted, setMuted] = useState(false);
+  const [showLiveFeed, setShowLiveFeed] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   const { playPing } = useAlertSound(muted);
+
+  // ─── Geopolitical live feed ────────────────────────────────────────────────
+  const { events: geoEvents, loading: geoLoading, error: geoError, lastFetch: geoLastFetch, refresh: geoRefresh } = useGeoPoliticalFeed(showLiveFeed);
 
   // Propagate alerts up to parent when changed
   useEffect(() => {
