@@ -145,13 +145,19 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
   };
 
   const cities = [
-    { id: "all", name: "All Cities" },
-    { id: "nairobi", name: "Nairobi" },
-    { id: "lagos", name: "Lagos" },
-    { id: "cairo", name: "Cairo" },
-    { id: "mumbai", name: "Mumbai" },
+    { id: "all",      name: "All Cities" },
+    { id: "nairobi",  name: "Nairobi" },
+    { id: "lagos",    name: "Lagos" },
+    { id: "cairo",    name: "Cairo" },
+    { id: "mumbai",   name: "Mumbai" },
     { id: "saopaulo", name: "São Paulo" },
-    { id: "jakarta", name: "Jakarta" },
+    { id: "jakarta",  name: "Jakarta" },
+    { id: "dhaka",    name: "Dhaka" },
+    { id: "karachi",  name: "Karachi" },
+    { id: "kinshasa", name: "Kinshasa" },
+    { id: "bogota",   name: "Bogotá" },
+    { id: "manila",   name: "Manila" },
+    { id: "accra",    name: "Accra" },
   ];
 
   return (
