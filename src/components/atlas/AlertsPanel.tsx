@@ -191,6 +191,19 @@ const AlertsPanel = ({ selectedCityId, onAlertsChange }: AlertsPanelProps) => {
           </div>
         </div>
         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          {/* Geo Feed toggle */}
+          <button
+            onClick={() => setShowLiveFeed((v) => !v)}
+            className={`flex items-center gap-1 p-1.5 rounded border transition-all text-[10px] font-mono ${
+              showLiveFeed
+                ? "border-accent/50 bg-accent/10 text-accent"
+                : "border-border text-muted-foreground hover:border-muted-foreground/50"
+            }`}
+            title={showLiveFeed ? "Hide live geo feed" : "Show live geopolitical feed"}
+          >
+            <Rss className="w-3 h-3" />
+            <span className="hidden sm:inline">GEO FEED</span>
+          </button>
           {/* Mute toggle */}
           <button
             onClick={() => setMuted((v) => !v)}
