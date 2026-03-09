@@ -390,18 +390,13 @@ const GlobeView = ({
     };
   }, [onMouseMove, onMouseUp]);
 
-  // Project city lon/lat to screen coords
+  /**
+   * Project a city's lon/lat to SVG screen coordinates.
+   * Returns null when the city is on the back hemisphere (projection returns null).
+   * The SVG clipPath="url(#globeClip)" additionally clips the rendered circle
+   * to the visible hemisphere circle.
+   */
   const projectCity = (city: CityData) => {
-    const [x, y] = projection([city.lon, city.lat]) ?? [null, null];
-    if (x === null || y === null) return null;
-    // Check if city is on the visible hemisphere
-    const p = d3geo.geoOrthographic()
-      .scale(radius)
-      .translate([W / 2, H / 2])
-      .rotate(rotation)
-      .clipAngle(90);
-    const visible = p.clipAngle();
-    // Use the projection to test visibility
     const coords = projection([city.lon, city.lat]);
     if (!coords) return null;
     return { x: coords[0], y: coords[1] };
