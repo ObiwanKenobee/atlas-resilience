@@ -24,6 +24,21 @@ import type { AlertEvent } from "@/components/atlas/AlertsPanel";
 
 
 // ─── City core dataset ────────────────────────────────────────────────────────
+const CITY_META: Record<string, { name: string; region: string }> = {
+  nairobi:  { name: "Nairobi",   region: "East Africa" },
+  lagos:    { name: "Lagos",     region: "West Africa" },
+  cairo:    { name: "Cairo",     region: "North Africa" },
+  mumbai:   { name: "Mumbai",    region: "South Asia" },
+  saopaulo: { name: "São Paulo", region: "South America" },
+  jakarta:  { name: "Jakarta",   region: "Southeast Asia" },
+  dhaka:    { name: "Dhaka",     region: "South Asia" },
+  karachi:  { name: "Karachi",   region: "South Asia" },
+  kinshasa: { name: "Kinshasa",  region: "Central Africa" },
+  bogota:   { name: "Bogotá",    region: "South America" },
+  manila:   { name: "Manila",    region: "Southeast Asia" },
+  accra:    { name: "Accra",     region: "West Africa" },
+};
+
 const cityDataset: Record<
   string,
   {
@@ -104,6 +119,78 @@ const cityDataset: Record<
     ],
     tippingProbability: 79,
     trend: "rising",
+  },
+  dhaka: {
+    score: 34,
+    subscores: [
+      { label: "REDUNDANCY", value: 28, icon: "⛓" },
+      { label: "DIVERSITY", value: 32, icon: "🌿" },
+      { label: "BUFFER CAP.", value: 22, icon: "🛡" },
+      { label: "CONNECTIVITY", value: 48, icon: "🔗" },
+      { label: "RECOVERY", value: 40, icon: "🔄" },
+    ],
+    tippingProbability: 82,
+    trend: "rising",
+  },
+  karachi: {
+    score: 41,
+    subscores: [
+      { label: "REDUNDANCY", value: 38, icon: "⛓" },
+      { label: "DIVERSITY", value: 35, icon: "🌿" },
+      { label: "BUFFER CAP.", value: 32, icon: "🛡" },
+      { label: "CONNECTIVITY", value: 55, icon: "🔗" },
+      { label: "RECOVERY", value: 45, icon: "🔄" },
+    ],
+    tippingProbability: 71,
+    trend: "rising",
+  },
+  kinshasa: {
+    score: 31,
+    subscores: [
+      { label: "REDUNDANCY", value: 22, icon: "⛓" },
+      { label: "DIVERSITY", value: 28, icon: "🌿" },
+      { label: "BUFFER CAP.", value: 20, icon: "🛡" },
+      { label: "CONNECTIVITY", value: 42, icon: "🔗" },
+      { label: "RECOVERY", value: 43, icon: "🔄" },
+    ],
+    tippingProbability: 88,
+    trend: "rising",
+  },
+  bogota: {
+    score: 53,
+    subscores: [
+      { label: "REDUNDANCY", value: 55, icon: "⛓" },
+      { label: "DIVERSITY", value: 60, icon: "🌿" },
+      { label: "BUFFER CAP.", value: 48, icon: "🛡" },
+      { label: "CONNECTIVITY", value: 62, icon: "🔗" },
+      { label: "RECOVERY", value: 40, icon: "🔄" },
+    ],
+    tippingProbability: 47,
+    trend: "stable",
+  },
+  manila: {
+    score: 46,
+    subscores: [
+      { label: "REDUNDANCY", value: 40, icon: "⛓" },
+      { label: "DIVERSITY", value: 45, icon: "🌿" },
+      { label: "BUFFER CAP.", value: 35, icon: "🛡" },
+      { label: "CONNECTIVITY", value: 62, icon: "🔗" },
+      { label: "RECOVERY", value: 48, icon: "🔄" },
+    ],
+    tippingProbability: 65,
+    trend: "rising",
+  },
+  accra: {
+    score: 49,
+    subscores: [
+      { label: "REDUNDANCY", value: 48, icon: "⛓" },
+      { label: "DIVERSITY", value: 52, icon: "🌿" },
+      { label: "BUFFER CAP.", value: 40, icon: "🛡" },
+      { label: "CONNECTIVITY", value: 58, icon: "🔗" },
+      { label: "RECOVERY", value: 47, icon: "🔄" },
+    ],
+    tippingProbability: 55,
+    trend: "stable",
   },
 };
 
@@ -221,6 +308,114 @@ const networkData: Record<string, { nodes: NetworkNode[]; edges: NetworkEdge[] }
       { source: "water", target: "health", strength: 0.75 },
     ],
   },
+  dhaka: {
+    nodes: [
+      { id: "flood", label: "Flood Control", sector: "Infrastructure", dependency: 0.95, cascadeRisk: 0.92 },
+      { id: "water", label: "Water Supply", sector: "Water", dependency: 0.88, cascadeRisk: 0.82 },
+      { id: "energy", label: "Power Grid", sector: "Energy", dependency: 0.72, cascadeRisk: 0.68 },
+      { id: "food", label: "Food Markets", sector: "Food", dependency: 0.78, cascadeRisk: 0.70 },
+      { id: "health", label: "Healthcare", sector: "Health", dependency: 0.65, cascadeRisk: 0.60 },
+      { id: "finance", label: "Garment Trade", sector: "Finance", dependency: 0.80, cascadeRisk: 0.72 },
+    ],
+    edges: [
+      { source: "flood", target: "water", strength: 0.95 },
+      { source: "flood", target: "food", strength: 0.88 },
+      { source: "water", target: "health", strength: 0.82 },
+      { source: "energy", target: "health", strength: 0.75 },
+      { source: "finance", target: "food", strength: 0.65 },
+      { source: "flood", target: "energy", strength: 0.80 },
+    ],
+  },
+  karachi: {
+    nodes: [
+      { id: "water", label: "Water Network", sector: "Water", dependency: 0.92, cascadeRisk: 0.88 },
+      { id: "energy", label: "Power Grid", sector: "Energy", dependency: 0.85, cascadeRisk: 0.78 },
+      { id: "port", label: "Port Qasim", sector: "Infrastructure", dependency: 0.88, cascadeRisk: 0.70 },
+      { id: "food", label: "Food Supply", sector: "Food", dependency: 0.70, cascadeRisk: 0.65 },
+      { id: "finance", label: "Finance", sector: "Finance", dependency: 0.60, cascadeRisk: 0.50 },
+      { id: "health", label: "Hospitals", sector: "Health", dependency: 0.62, cascadeRisk: 0.55 },
+    ],
+    edges: [
+      { source: "water", target: "health", strength: 0.92 },
+      { source: "energy", target: "water", strength: 0.85 },
+      { source: "port", target: "food", strength: 0.82 },
+      { source: "energy", target: "health", strength: 0.78 },
+      { source: "finance", target: "food", strength: 0.55 },
+      { source: "port", target: "energy", strength: 0.60 },
+    ],
+  },
+  kinshasa: {
+    nodes: [
+      { id: "energy", label: "Inga Dam Grid", sector: "Energy", dependency: 0.90, cascadeRisk: 0.88 },
+      { id: "health", label: "Healthcare", sector: "Health", dependency: 0.85, cascadeRisk: 0.85 },
+      { id: "water", label: "Water System", sector: "Water", dependency: 0.80, cascadeRisk: 0.78 },
+      { id: "food", label: "Food Supply", sector: "Food", dependency: 0.78, cascadeRisk: 0.72 },
+      { id: "infra", label: "Roads", sector: "Infrastructure", dependency: 0.68, cascadeRisk: 0.60 },
+      { id: "eco", label: "Congo Basin", sector: "Ecosystem", dependency: 0.50, cascadeRisk: 0.40 },
+    ],
+    edges: [
+      { source: "energy", target: "health", strength: 0.92 },
+      { source: "energy", target: "water", strength: 0.88 },
+      { source: "water", target: "food", strength: 0.80 },
+      { source: "infra", target: "food", strength: 0.72 },
+      { source: "health", target: "food", strength: 0.60 },
+      { source: "eco", target: "water", strength: 0.55 },
+    ],
+  },
+  bogota: {
+    nodes: [
+      { id: "water", label: "Páramo Aquifer", sector: "Water", dependency: 0.88, cascadeRisk: 0.70 },
+      { id: "energy", label: "Hydro Grid", sector: "Energy", dependency: 0.80, cascadeRisk: 0.58 },
+      { id: "eco", label: "Andean Ecosystem", sector: "Ecosystem", dependency: 0.72, cascadeRisk: 0.62 },
+      { id: "food", label: "Food Supply", sector: "Food", dependency: 0.65, cascadeRisk: 0.50 },
+      { id: "finance", label: "Finance", sector: "Finance", dependency: 0.70, cascadeRisk: 0.48 },
+      { id: "infra", label: "Road Network", sector: "Infrastructure", dependency: 0.62, cascadeRisk: 0.55 },
+    ],
+    edges: [
+      { source: "eco", target: "water", strength: 0.90 },
+      { source: "water", target: "energy", strength: 0.80 },
+      { source: "energy", target: "food", strength: 0.70 },
+      { source: "finance", target: "food", strength: 0.60 },
+      { source: "infra", target: "food", strength: 0.58 },
+      { source: "water", target: "food", strength: 0.72 },
+    ],
+  },
+  manila: {
+    nodes: [
+      { id: "typhoon", label: "Storm Systems", sector: "Infrastructure", dependency: 0.92, cascadeRisk: 0.90 },
+      { id: "water", label: "Water Supply", sector: "Water", dependency: 0.80, cascadeRisk: 0.72 },
+      { id: "energy", label: "Power Grid", sector: "Energy", dependency: 0.78, cascadeRisk: 0.68 },
+      { id: "food", label: "Food Supply", sector: "Food", dependency: 0.70, cascadeRisk: 0.62 },
+      { id: "finance", label: "Finance", sector: "Finance", dependency: 0.65, cascadeRisk: 0.52 },
+      { id: "health", label: "Hospitals", sector: "Health", dependency: 0.60, cascadeRisk: 0.55 },
+    ],
+    edges: [
+      { source: "typhoon", target: "energy", strength: 0.92 },
+      { source: "typhoon", target: "water", strength: 0.88 },
+      { source: "energy", target: "health", strength: 0.82 },
+      { source: "water", target: "food", strength: 0.75 },
+      { source: "finance", target: "food", strength: 0.58 },
+      { source: "typhoon", target: "food", strength: 0.78 },
+    ],
+  },
+  accra: {
+    nodes: [
+      { id: "energy", label: "Akosombo Dam", sector: "Energy", dependency: 0.88, cascadeRisk: 0.72 },
+      { id: "water", label: "Water Supply", sector: "Water", dependency: 0.78, cascadeRisk: 0.65 },
+      { id: "finance", label: "Finance", sector: "Finance", dependency: 0.65, cascadeRisk: 0.48 },
+      { id: "food", label: "Food Markets", sector: "Food", dependency: 0.68, cascadeRisk: 0.55 },
+      { id: "health", label: "Healthcare", sector: "Health", dependency: 0.58, cascadeRisk: 0.45 },
+      { id: "port", label: "Tema Port", sector: "Infrastructure", dependency: 0.72, cascadeRisk: 0.58 },
+    ],
+    edges: [
+      { source: "energy", target: "water", strength: 0.85 },
+      { source: "energy", target: "health", strength: 0.78 },
+      { source: "port", target: "food", strength: 0.80 },
+      { source: "water", target: "food", strength: 0.68 },
+      { source: "finance", target: "food", strength: 0.55 },
+      { source: "energy", target: "food", strength: 0.62 },
+    ],
+  },
 };
 
 // ─── Historical data per city ─────────────────────────────────────────────────
@@ -301,134 +496,84 @@ const historicalData: Record<string, { data: { month: string; score: number }[];
       { month: "Nov", label: "Capital relocation plan announced", severity: "medium" },
     ],
   },
+  dhaka: {
+    data: [
+      { month: "Mar", score: 36 }, { month: "Apr", score: 38 }, { month: "May", score: 35 },
+      { month: "Jun", score: 30 }, { month: "Jul", score: 28 }, { month: "Aug", score: 27 },
+      { month: "Sep", score: 30 }, { month: "Oct", score: 33 }, { month: "Nov", score: 35 },
+      { month: "Dec", score: 34 }, { month: "Jan", score: 34 }, { month: "Feb", score: 34 },
+    ],
+    events: [
+      { month: "Jun", label: "Monsoon surge — 14 districts inundated", severity: "critical" },
+      { month: "Aug", label: "Cyclone landfall — coastal breaches", severity: "critical" },
+      { month: "Oct", label: "Flood relief operations concluded", severity: "medium" },
+    ],
+  },
+  karachi: {
+    data: [
+      { month: "Mar", score: 43 }, { month: "Apr", score: 44 }, { month: "May", score: 42 },
+      { month: "Jun", score: 39 }, { month: "Jul", score: 37 }, { month: "Aug", score: 38 },
+      { month: "Sep", score: 40 }, { month: "Oct", score: 41 }, { month: "Nov", score: 42 },
+      { month: "Dec", score: 41 }, { month: "Jan", score: 41 }, { month: "Feb", score: 41 },
+    ],
+    events: [
+      { month: "Jun", label: "Heatwave — 49°C peak, grid failure", severity: "critical" },
+      { month: "Sep", label: "Indus delta saltwater intrusion", severity: "high" },
+      { month: "Nov", label: "Emergency water rationing lifted", severity: "medium" },
+    ],
+  },
+  kinshasa: {
+    data: [
+      { month: "Mar", score: 33 }, { month: "Apr", score: 32 }, { month: "May", score: 31 },
+      { month: "Jun", score: 29 }, { month: "Jul", score: 28 }, { month: "Aug", score: 27 },
+      { month: "Sep", score: 29 }, { month: "Oct", score: 30 }, { month: "Nov", score: 31 },
+      { month: "Dec", score: 31 }, { month: "Jan", score: 31 }, { month: "Feb", score: 31 },
+    ],
+    events: [
+      { month: "Jul", label: "Cholera outbreak — 3 zones overwhelmed", severity: "critical" },
+      { month: "Sep", label: "Inga Dam output cut by 60%", severity: "critical" },
+      { month: "Nov", label: "WHO emergency response deployed", severity: "medium" },
+    ],
+  },
+  bogota: {
+    data: [
+      { month: "Mar", score: 55 }, { month: "Apr", score: 56 }, { month: "May", score: 54 },
+      { month: "Jun", score: 52 }, { month: "Jul", score: 50 }, { month: "Aug", score: 51 },
+      { month: "Sep", score: 52 }, { month: "Oct", score: 53 }, { month: "Nov", score: 54 },
+      { month: "Dec", score: 53 }, { month: "Jan", score: 53 }, { month: "Feb", score: 53 },
+    ],
+    events: [
+      { month: "Jun", label: "Páramo aquifer recharge −18%", severity: "high" },
+      { month: "Aug", label: "Landslide disrupts highway", severity: "medium" },
+    ],
+  },
+  manila: {
+    data: [
+      { month: "Mar", score: 48 }, { month: "Apr", score: 49 }, { month: "May", score: 47 },
+      { month: "Jun", score: 44 }, { month: "Jul", score: 41 }, { month: "Aug", score: 40 },
+      { month: "Sep", score: 43 }, { month: "Oct", score: 45 }, { month: "Nov", score: 46 },
+      { month: "Dec", score: 46 }, { month: "Jan", score: 46 }, { month: "Feb", score: 46 },
+    ],
+    events: [
+      { month: "Jul", label: "Typhoon landfall — 1.2M evacuated", severity: "critical" },
+      { month: "Sep", label: "Marikina river levee breach", severity: "high" },
+      { month: "Nov", label: "Typhoon season ends", severity: "medium" },
+    ],
+  },
+  accra: {
+    data: [
+      { month: "Mar", score: 51 }, { month: "Apr", score: 52 }, { month: "May", score: 50 },
+      { month: "Jun", score: 48 }, { month: "Jul", score: 47 }, { month: "Aug", score: 47 },
+      { month: "Sep", score: 48 }, { month: "Oct", score: 49 }, { month: "Nov", score: 50 },
+      { month: "Dec", score: 49 }, { month: "Jan", score: 49 }, { month: "Feb", score: 49 },
+    ],
+    events: [
+      { month: "Jun", label: "Akosombo dam output −35%", severity: "high" },
+      { month: "Aug", label: "Load shedding extended to 14h/day", severity: "high" },
+      { month: "Oct", label: "New solar capacity online", severity: "medium" },
+    ],
+  },
 };
-
-// ─── Static data ──────────────────────────────────────────────────────────────
-const cityDimensions = (id: string) => {
-  const s = cityDataset[id];
-  return [
-    { label: "Redund.", fullLabel: "Redundancy", value: s.subscores[0].value },
-    { label: "Diversity", fullLabel: "Diversity", value: s.subscores[1].value },
-    { label: "Buffer", fullLabel: "Buffer Capacity", value: s.subscores[2].value },
-    { label: "Connect.", fullLabel: "Connectivity", value: s.subscores[3].value },
-    { label: "Recovery", fullLabel: "Recovery Speed", value: s.subscores[4].value },
-  ];
-};
-
-const tippingSignals = [
-  { label: "Increasing output volatility", active: true, severity: "high" as const },
-  { label: "Slower post-disturbance recovery", active: true, severity: "high" as const },
-  { label: "Rising cross-sector correlation", active: false, severity: "medium" as const },
-  { label: "Loss of biodiversity markers", active: true, severity: "medium" as const },
-  { label: "Declining redundancy pathways", active: false, severity: "low" as const },
-  { label: "Cascading micro-failures detected", active: true, severity: "high" as const },
-];
-
-const bufferData = [
-  { label: "Water Reservoir", icon: "💧", current: 34, max: 100, unit: "M m³", dangerThreshold: 0.4 },
-  { label: "Food Stockpile", icon: "🌾", current: 62, max: 100, unit: "days", dangerThreshold: 0.3 },
-  { label: "Grid Battery Reserve", icon: "⚡", current: 55, max: 100, unit: "GWh", dangerThreshold: 0.35 },
-  { label: "Financial Reserves", icon: "💰", current: 74, max: 100, unit: "B$", dangerThreshold: 0.25 },
-];
-
-const recoverySystemData = [
-  { name: "Power Grid", color: "hsl(var(--accent))", recoveryDays: 14, data: [{ t: 0, val: 100 }, { t: 1, val: 22 }, { t: 3, val: 35 }, { t: 5, val: 55 }, { t: 7, val: 68 }, { t: 10, val: 80 }, { t: 14, val: 95 }, { t: 18, val: 100 }] },
-  { name: "Water Systems", color: "hsl(198 90% 52%)", recoveryDays: 21, data: [{ t: 0, val: 100 }, { t: 1, val: 45 }, { t: 3, val: 50 }, { t: 7, val: 62 }, { t: 12, val: 74 }, { t: 18, val: 88 }, { t: 21, val: 96 }] },
-  { name: "Food Supply", color: "hsl(var(--warn))", recoveryDays: 42, data: [{ t: 0, val: 100 }, { t: 1, val: 60 }, { t: 5, val: 55 }, { t: 10, val: 60 }, { t: 18, val: 72 }, { t: 28, val: 84 }, { t: 38, val: 92 }, { t: 42, val: 100 }] },
-  { name: "Ecosystem", color: "hsl(var(--healthy))", recoveryDays: 90, data: [{ t: 0, val: 100 }, { t: 3, val: 40 }, { t: 10, val: 42 }, { t: 21, val: 50 }, { t: 35, val: 60 }, { t: 55, val: 74 }, { t: 75, val: 88 }, { t: 90, val: 97 }] },
-];
-
-// ─── Component ────────────────────────────────────────────────────────────────
-const Index = () => {
-  const [selectedCityId, setSelectedCityId] = useState("nairobi");
-  const [selectedCityLabel, setSelectedCityLabel] = useState({ name: "Nairobi", region: "East Africa" });
-  const [liveMode, setLiveMode] = useState(false);
-  const [showReport, setShowReport] = useState(false);
-  const [showCompare, setShowCompare] = useState(false);
-  const [compareCityAId, setCompareCityAId] = useState("nairobi");
-  const [compareCityBId, setCompareCityBId] = useState("jakarta");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [drawerCity, setDrawerCity] = useState<CityData | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [liveAlerts, setLiveAlerts] = useState<AlertEvent[]>([]);
-
-  // Apply theme class to <html>
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("theme-dark", "theme-light");
-    root.classList.add(`theme-${theme}`);
-  }, [theme]);
-
-  const handleCitySelect = (city: CityData) => {
-    setSelectedCityId(city.id);
-    setSelectedCityLabel({ name: city.name, region: city.region });
-    setDrawerCity(city);
-    setDrawerOpen(true);
-  };
-
-  const handleAlertsChange = useCallback((alerts: AlertEvent[]) => {
-    setLiveAlerts(alerts);
-  }, []);
-
-  const cityInfo = cityDataset[selectedCityId];
-
-  const { metrics: liveMetrics, lastUpdate, tickCount } = useLiveData(
-    { score: cityInfo.score, subscores: cityInfo.subscores, tippingProbability: cityInfo.tippingProbability },
-    liveMode
-  );
-
-  const displayedMetrics = liveMode ? liveMetrics : cityInfo;
-  const netGraph = networkData[selectedCityId];
-  const histData = historicalData[selectedCityId];
-
-  // Data for the Planetary Risk Matrix
-  const riskMatrixCities = Object.entries(cityDataset).map(([id, data]) => ({
-    id,
-    name: id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1),
-    region: networkData[id] ? (
-      id === "nairobi" ? "East Africa" :
-      id === "lagos" ? "West Africa" :
-      id === "cairo" ? "North Africa" :
-      id === "mumbai" ? "South Asia" :
-      id === "saopaulo" ? "South America" : "Southeast Asia"
-    ) : "",
-    score: data.score,
-    tipping: data.tippingProbability,
-  }));
-
-  // Compare city objects
-  const buildCompareCity = (id: string) => {
-    const d = cityDataset[id];
-    const label = id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1);
-    const region =
-      id === "nairobi" ? "East Africa" :
-      id === "lagos" ? "West Africa" :
-      id === "cairo" ? "North Africa" :
-      id === "mumbai" ? "South Asia" :
-      id === "saopaulo" ? "South America" : "Southeast Asia";
-    return {
-      id,
-      name: label,
-      region,
-      score: d.score,
-      subscores: d.subscores.map((s) => ({
-        ...s,
-        fullLabel: s.label === "REDUNDANCY" ? "Redundancy" :
-          s.label === "DIVERSITY" ? "Diversity" :
-          s.label === "BUFFER CAP." ? "Buffer Capacity" :
-          s.label === "CONNECTIVITY" ? "Connectivity" : "Recovery Speed",
-      })),
-      tippingProbability: d.tippingProbability,
-      trend: d.trend,
-    };
-  };
-
-  const cityNameMap = Object.fromEntries(
-    Object.keys(cityDataset).map((id) => [
-      id,
-      id === "saopaulo" ? "São Paulo" : id.charAt(0).toUpperCase() + id.slice(1),
-    ])
-  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
