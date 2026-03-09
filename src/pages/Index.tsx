@@ -21,9 +21,7 @@ import type { CityData } from "@/components/atlas/SystemStressMap";
 import type { NetworkNode, NetworkEdge } from "@/components/atlas/NetworkFragilityGraph";
 import type { AlertEvent } from "@/components/atlas/AlertsPanel";
 
-
-
-// ─── City core dataset ────────────────────────────────────────────────────────
+// ─── City metadata ────────────────────────────────────────────────────────────
 const CITY_META: Record<string, { name: string; region: string }> = {
   nairobi:  { name: "Nairobi",   region: "East Africa" },
   lagos:    { name: "Lagos",     region: "West Africa" },
@@ -39,6 +37,7 @@ const CITY_META: Record<string, { name: string; region: string }> = {
   accra:    { name: "Accra",     region: "West Africa" },
 };
 
+// ─── City core dataset ────────────────────────────────────────────────────────
 const cityDataset: Record<
   string,
   {
@@ -575,6 +574,120 @@ const historicalData: Record<string, { data: { month: string; score: number }[];
   },
 };
 
+// ─── Static data ──────────────────────────────────────────────────────────────
+const cityDimensions = (id: string) => {
+  const s = cityDataset[id];
+  if (!s) return [];
+  return [
+    { label: "Redund.", fullLabel: "Redundancy", value: s.subscores[0].value },
+    { label: "Diversity", fullLabel: "Diversity", value: s.subscores[1].value },
+    { label: "Buffer", fullLabel: "Buffer Capacity", value: s.subscores[2].value },
+    { label: "Connect.", fullLabel: "Connectivity", value: s.subscores[3].value },
+    { label: "Recovery", fullLabel: "Recovery Speed", value: s.subscores[4].value },
+  ];
+};
+
+const tippingSignals = [
+  { label: "Increasing output volatility", active: true, severity: "high" as const },
+  { label: "Slower post-disturbance recovery", active: true, severity: "high" as const },
+  { label: "Rising cross-sector correlation", active: false, severity: "medium" as const },
+  { label: "Loss of biodiversity markers", active: true, severity: "medium" as const },
+  { label: "Declining redundancy pathways", active: false, severity: "low" as const },
+  { label: "Cascading micro-failures detected", active: true, severity: "high" as const },
+];
+
+const bufferData = [
+  { label: "Water Reservoir", icon: "💧", current: 34, max: 100, unit: "M m³", dangerThreshold: 0.4 },
+  { label: "Food Stockpile", icon: "🌾", current: 62, max: 100, unit: "days", dangerThreshold: 0.3 },
+  { label: "Grid Battery Reserve", icon: "⚡", current: 55, max: 100, unit: "GWh", dangerThreshold: 0.35 },
+  { label: "Financial Reserves", icon: "💰", current: 74, max: 100, unit: "B$", dangerThreshold: 0.25 },
+];
+
+const recoverySystemData = [
+  { name: "Power Grid", color: "hsl(var(--accent))", recoveryDays: 14, data: [{ t: 0, val: 100 }, { t: 1, val: 22 }, { t: 3, val: 35 }, { t: 5, val: 55 }, { t: 7, val: 68 }, { t: 10, val: 80 }, { t: 14, val: 95 }, { t: 18, val: 100 }] },
+  { name: "Water Systems", color: "hsl(198 90% 52%)", recoveryDays: 21, data: [{ t: 0, val: 100 }, { t: 1, val: 45 }, { t: 3, val: 50 }, { t: 7, val: 62 }, { t: 12, val: 74 }, { t: 18, val: 88 }, { t: 21, val: 96 }] },
+  { name: "Food Supply", color: "hsl(var(--warn))", recoveryDays: 42, data: [{ t: 0, val: 100 }, { t: 1, val: 60 }, { t: 5, val: 55 }, { t: 10, val: 60 }, { t: 18, val: 72 }, { t: 28, val: 84 }, { t: 38, val: 92 }, { t: 42, val: 100 }] },
+  { name: "Ecosystem", color: "hsl(var(--healthy))", recoveryDays: 90, data: [{ t: 0, val: 100 }, { t: 3, val: 40 }, { t: 10, val: 42 }, { t: 21, val: 50 }, { t: 35, val: 60 }, { t: 55, val: 74 }, { t: 75, val: 88 }, { t: 90, val: 97 }] },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
+const Index = () => {
+  const [selectedCityId, setSelectedCityId] = useState("nairobi");
+  const [selectedCityLabel, setSelectedCityLabel] = useState({ name: "Nairobi", region: "East Africa" });
+  const [liveMode, setLiveMode] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareCityAId, setCompareCityAId] = useState("nairobi");
+  const [compareCityBId, setCompareCityBId] = useState("jakarta");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [drawerCity, setDrawerCity] = useState<CityData | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [liveAlerts, setLiveAlerts] = useState<AlertEvent[]>([]);
+
+  // Apply theme class to <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("theme-dark", "theme-light");
+    root.classList.add(`theme-${theme}`);
+  }, [theme]);
+
+  const handleCitySelect = (city: CityData) => {
+    setSelectedCityId(city.id);
+    setSelectedCityLabel({ name: city.name, region: city.region });
+    setDrawerCity(city);
+    setDrawerOpen(true);
+  };
+
+  const handleAlertsChange = useCallback((alerts: AlertEvent[]) => {
+    setLiveAlerts(alerts);
+  }, []);
+
+  // Safe fallback to nairobi if new city clicked but dataset somehow missing
+  const cityInfo = cityDataset[selectedCityId] ?? cityDataset["nairobi"];
+
+  const { metrics: liveMetrics, lastUpdate, tickCount } = useLiveData(
+    { score: cityInfo.score, subscores: cityInfo.subscores, tippingProbability: cityInfo.tippingProbability },
+    liveMode
+  );
+
+  const displayedMetrics = liveMode ? liveMetrics : cityInfo;
+  const netGraph = networkData[selectedCityId] ?? networkData["nairobi"];
+  const histData = historicalData[selectedCityId] ?? historicalData["nairobi"];
+
+  // Data for the Planetary Risk Matrix — all 12 cities
+  const riskMatrixCities = Object.entries(cityDataset).map(([id, data]) => ({
+    id,
+    name: CITY_META[id]?.name ?? id,
+    region: CITY_META[id]?.region ?? "",
+    score: data.score,
+    tipping: data.tippingProbability,
+  }));
+
+  // Compare city objects
+  const buildCompareCity = (id: string) => {
+    const d = cityDataset[id] ?? cityDataset["nairobi"];
+    const meta = CITY_META[id] ?? CITY_META["nairobi"];
+    return {
+      id,
+      name: meta.name,
+      region: meta.region,
+      score: d.score,
+      subscores: d.subscores.map((s) => ({
+        ...s,
+        fullLabel: s.label === "REDUNDANCY" ? "Redundancy" :
+          s.label === "DIVERSITY" ? "Diversity" :
+          s.label === "BUFFER CAP." ? "Buffer Capacity" :
+          s.label === "CONNECTIVITY" ? "Connectivity" : "Recovery Speed",
+      })),
+      tippingProbability: d.tippingProbability,
+      trend: d.trend,
+    };
+  };
+
+  const cityNameMap = Object.fromEntries(
+    Object.keys(CITY_META).map((id) => [id, CITY_META[id].name])
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <AtlasHeader theme={theme} onThemeToggle={() => setTheme((t) => t === "dark" ? "light" : "dark")} />
@@ -655,16 +768,8 @@ const historicalData: Record<string, { data: { month: string; score: number }[];
             cities={riskMatrixCities}
             selectedCityId={selectedCityId}
             onSelectCity={(id) => {
-              const labels: Record<string, { name: string; region: string }> = {
-                nairobi: { name: "Nairobi", region: "East Africa" },
-                lagos: { name: "Lagos", region: "West Africa" },
-                cairo: { name: "Cairo", region: "North Africa" },
-                mumbai: { name: "Mumbai", region: "South Asia" },
-                saopaulo: { name: "São Paulo", region: "South America" },
-                jakarta: { name: "Jakarta", region: "Southeast Asia" },
-              };
               setSelectedCityId(id);
-              setSelectedCityLabel(labels[id]);
+              setSelectedCityLabel(CITY_META[id] ?? { name: id, region: "" });
             }}
           />
         </motion.div>
@@ -786,7 +891,8 @@ const historicalData: Record<string, { data: { month: string; score: number }[];
         onCompare={() => {
           if (drawerCity) {
             setCompareCityAId(drawerCity.id);
-            setCompareCityBId(drawerCity.id === "jakarta" ? "saopaulo" : "jakarta");
+            const fallback = drawerCity.id === "jakarta" ? "saopaulo" : "jakarta";
+            setCompareCityBId(fallback);
           }
           setDrawerOpen(false);
           setShowCompare(true);
